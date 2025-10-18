@@ -188,33 +188,291 @@
                 height: 300px;
             }
         }
+        /* Animações para o header */
+@keyframes slideInDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(76, 175, 80, 0.6);
+    }
+}
+
+/* Aplicar animação ao header */
+header {
+    animation: slideInDown 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+/* Estilos para os links de navegação */
+.nav-link {
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(76, 175, 80, 0.1), transparent);
+    transition: left 0.6s ease;
+}
+
+.nav-link:hover::before {
+    left: 100%;
+}
+
+.nav-link:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.05), rgba(129, 199, 132, 0.05));
+}
+
+/* Botão de login animado */
+.login-btn {
+    animation: pulseGlow 2s infinite;
+}
+
+.login-btn:hover {
+    animation: none;
+    box-shadow: 0 10px 25px rgba(76, 175, 80, 0.4);
+}
+
+/* Menu mobile */
+#mobile-menu {
+    animation: fadeInUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.mobile-nav-link {
+    transform: translateX(-20px);
+    opacity: 0;
+    animation: fadeInUp 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.mobile-nav-link:nth-child(1) { animation-delay: 0.1s; }
+.mobile-nav-link:nth-child(2) { animation-delay: 0.2s; }
+.mobile-nav-link:nth-child(3) { animation-delay: 0.3s; }
+.mobile-nav-link:nth-child(4) { animation-delay: 0.4s; }
+
+.mobile-nav-link:hover {
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Efeito de scroll no header */
+.header-scrolled {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(76, 175, 80, 0.1);
+}
+
+/* NOVOS ESTILOS PARA AS FUNCIONALIDADES ADICIONADAS */
+.taxa-calculator {
+    background: linear-gradient(135deg, #f0f9f0 0%, #e8f5e8 100%);
+    border: 2px dashed #4CAF50;
+}
+
+.sustainability-badge {
+    background: linear-gradient(135deg, #4CAF50, #81C784);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    animation: pulseGlow 3s infinite;
+}
+
+.esg-report-card {
+    background: white;
+    border-left: 4px solid #4CAF50;
+    transition: all 0.3s ease;
+}
+
+.esg-report-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.match-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.match-excellent { background-color: #4CAF50; }
+.match-good { background-color: #FFA726; }
+.match-fair { background-color: #FF9800; }
+
+.qr-scanner-container {
+    background: #f5f5f5;
+    border: 2px dashed #ccc;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.qr-scanner-container.active {
+    border-color: #4CAF50;
+    background: #f0f9f0;
+}
+
+.public-dashboard-metric {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.public-dashboard-metric:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
     </style>
 </head>
 <body class="min-h-screen">
-    <header class="sticky top-0 z-50 bg-white shadow-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <a href="#home" class="text-2xl font-header text-verde-principal tracking-wider flex items-center" onclick="showSection('home')">
-                    <i data-lucide="leaf" class="w-6 h-6 mr-1 text-verde-principal"></i>
-                    Reaproveita+
-                </a>
-                <nav class="hidden md:flex space-x-8 cta-btn">
-                    <a href="#home" class="text-cinza-escuro hover:text-verde-principal transition" onclick="showSection('home')">Home</a>
-                    <a href="#como-funciona" class="text-cinza-escuro hover:text-verde-principal transition" onclick="scrollToElement('como-funciona')">Como Funciona</a>
-                    <a href="#impacto" class="text-cinza-escuro hover:text-verde-principal transition" onclick="scrollToElement('impacto')">Impacto</a>
-                    <a href="#" onclick="showSection('cadastro');" class="text-cinza-escuro hover:text-verde-principal transition">Cadastre-se</a>
-                </nav>
-                <div class="flex items-center space-x-4">
-                    <button id="login-btn" class="cta-btn text-sm font-medium text-cinza-escuro hover:text-verde-principal transition" onclick="toggleDashboard()">
-                        Login
-                    </button>
-                    <button class="md:hidden p-2 rounded-lg hover:bg-cinza-claro transition">
-                        <i data-lucide="menu" class="w-6 h-6 text-cinza-escuro"></i>
-                    </button>
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-lg border-b border-verde-principal/20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-20">
+            <!-- Logo com animação -->
+            <a href="#home" class="group flex items-center space-x-3" onclick="showSection('home')">
+                <div class="relative">
+                    <div class="w-12 h-12 bg-gradient-to-br from-verde-principal to-verde-escuro rounded-2xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 shadow-lg">
+                        <i data-lucide="leaf" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <div class="absolute -inset-1 bg-verde-principal/20 rounded-2xl blur-sm group-hover:blur-md transition-all duration-500 opacity-0 group-hover:opacity-100"></div>
                 </div>
+                <div class="flex flex-col">
+                    <span class="text-2xl font-header text-verde-principal tracking-wider font-bold">Reaproveita+</span>
+                    <span class="text-xs text-cinza-escuro/70 font-medium -mt-1">Sustentabilidade em Ação</span>
+                </div>
+            </a>
+
+            <!-- Navegação com Login integrado -->
+            <nav class="hidden lg:flex items-center space-x-1">
+                <a href="#home" 
+                   class="nav-link group relative px-6 py-3 rounded-xl font-medium text-cinza-escuro hover:text-verde-principal transition-all duration-300"
+                   onclick="showSection('home')">
+                    <i data-lucide="home" class="w-4 h-4 inline mr-2"></i>
+                    Home
+                    <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-verde-principal group-hover:w-3/4 transition-all duration-500"></div>
+                </a>
+                
+                <a href="#como-funciona" 
+                   class="nav-link group relative px-6 py-3 rounded-xl font-medium text-cinza-escuro hover:text-verde-principal transition-all duration-300"
+                   onclick="scrollToElement('como-funciona')">
+                    <i data-lucide="play-circle" class="w-4 h-4 inline mr-2"></i>
+                    Como Funciona
+                    <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-laranja group-hover:w-3/4 transition-all duration-500"></div>
+                </a>
+                
+                <a href="#impacto" 
+                   class="nav-link group relative px-6 py-3 rounded-xl font-medium text-cinza-escuro hover:text-verde-principal transition-all duration-300"
+                   onclick="scrollToElement('impacto')">
+                    <i data-lucide="bar-chart-3" class="w-4 h-4 inline mr-2"></i>
+                    Impacto
+                    <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-azul-cooperativa group-hover:w-3/4 transition-all duration-500"></div>
+                </a>
+                
+                <!-- BOTÃO LOGIN NA NAVEGAÇÃO -->
+               <button id="login-btn" 
+        class="nav-link login-btn group relative px-6 py-3 rounded-xl bg-gradient-to-r from-verde-principal to-verde-secundario text-white font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 overflow-hidden"
+        onclick="showLoginScreen()">
+                    <span class="relative z-10 flex items-center">
+                        <i data-lucide="log-in" class="w-4 h-4 mr-2"></i>
+                        Login
+                    </span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-verde-escuro to-verde-principal opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </button>
+            </nav>
+
+            <!-- Menu Mobile -->
+            <div class="flex items-center space-x-3 lg:hidden">
+                <button class="p-3 rounded-xl bg-cinza-claro hover:bg-verde-principal/10 transition-all duration-300 group"
+                        onclick="toggleMobileMenu()">
+                    <i data-lucide="menu" class="w-6 h-6 text-cinza-escuro group-hover:text-verde-principal transition-colors duration-300"></i>
+                </button>
             </div>
         </div>
-    </header>
+
+        <!-- Menu Mobile Expandido -->
+        <div id="mobile-menu" class="lg:hidden hidden py-4 border-t border-cinza-medio/30">
+            <div class="flex flex-col space-y-3">
+                <a href="#home" 
+                   class="mobile-nav-link flex items-center px-4 py-3 rounded-xl bg-cinza-claro/50 text-cinza-escuro hover:bg-verde-principal hover:text-white transition-all duration-300"
+                   onclick="showSection('home'); hideMobileMenu()">
+                    <i data-lucide="home" class="w-5 h-5 mr-3"></i>
+                    Home
+                </a>
+                
+                <a href="#como-funciona" 
+                   class="mobile-nav-link flex items-center px-4 py-3 rounded-xl bg-cinza-claro/50 text-cinza-escuro hover:bg-laranja hover:text-white transition-all duration-300"
+                   onclick="scrollToElement('como-funciona'); hideMobileMenu()">
+                    <i data-lucide="play-circle" class="w-5 h-5 mr-3"></i>
+                    Como Funciona
+                </a>
+                
+                <a href="#impacto" 
+                   class="mobile-nav-link flex items-center px-4 py-3 rounded-xl bg-cinza-claro/50 text-cinza-escuro hover:bg-azul-cooperativa hover:text-white transition-all duration-300"
+                   onclick="scrollToElement('impacto'); hideMobileMenu()">
+                    <i data-lucide="bar-chart-3" class="w-5 h-5 mr-3"></i>
+                    Impacto
+                </a>
+                
+                <!-- BOTÃO LOGIN NO MOBILE -->
+               <button id="login-btn-mobile"
+        class="mobile-nav-link flex items-center px-4 py-3 rounded-xl bg-gradient-to-r from-verde-principal to-verde-secundario text-white font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+        onclick="showLoginScreen(); hideMobileMenu()">
+                    <i data-lucide="log-in" class="w-5 h-5 mr-3"></i>
+                    Login
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
 
     <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
         <section id="landing-page" class="space-y-20">
@@ -228,7 +486,7 @@
                             Conectamos doadores de alimentos com cooperativas e receptores, gerando sustentabilidade e nutrição para quem precisa.
                         </p>
                         <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 pt-8">
-                            <button class="btn-principal cta-btn text-white py-3 px-8 rounded-full shadow-lg cta-btn-shadow bg-verde-principal" onclick="showSection('cadastro')">
+                             <button class="btn-principal cta-btn text-white py-3 px-8 rounded-full shadow-lg cta-btn-shadow bg-verde-principal" onclick="showSection('cadastro')">
                                 <i data-lucide="heart" class="w-5 h-5 inline mr-2"></i> Quero Doar
                             </button>
                             <button class="bg-laranja cta-btn text-white py-3 px-8 rounded-full shadow-lg hover:bg-orange-600 cta-btn-shadow" onclick="showSection('cadastro')">
@@ -244,6 +502,64 @@
                                 <i data-lucide="network" class="w-10 h-10 mx-auto"></i>
                                 <p>Rede de Resgate Alimentar</p>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- NOVA SEÇÃO: PAINEL PÚBLICO DE IMPACTO -->
+            <section id="public-dashboard" class="bg-white rounded-3xl p-8 shadow-xl">
+                <h2 class="text-4xl font-header text-cinza-escuro text-center mb-12">Impacto em <span class="text-verde-principal">Tempo Real</span> no Estado</h2>
+                
+                <div class="grid md:grid-cols-4 gap-6 mb-8">
+                    <div class="public-dashboard-metric text-center">
+                        <i data-lucide="map-pin" class="w-8 h-8 mx-auto text-verde-principal mb-3"></i>
+                        <p class="text-2xl font-header text-verde-principal" id="public-municipios">42</p>
+                        <p class="text-sm text-gray-600">Municípios Ativos</p>
+                    </div>
+                    <div class="public-dashboard-metric text-center">
+                        <i data-lucide="building" class="w-8 h-8 mx-auto text-laranja mb-3"></i>
+                        <p class="text-2xl font-header text-laranja" id="public-doadores">156</p>
+                        <p class="text-sm text-gray-600">Doadores Cadastrados</p>
+                    </div>
+                    <div class="public-dashboard-metric text-center">
+                        <i data-lucide="users" class="w-8 h-8 mx-auto text-azul-cooperativa mb-3"></i>
+                        <p class="text-2xl font-header text-azul-cooperativa" id="public-receptores">89</p>
+                        <p class="text-sm text-gray-600">Receptores Ativos</p>
+                    </div>
+                    <div class="public-dashboard-metric text-center">
+                        <i data-lucide="truck" class="w-8 h-8 mx-auto text-verde-escuro mb-3"></i>
+                        <p class="text-2xl font-header text-verde-escuro" id="public-cooperativas">23</p>
+                        <p class="text-sm text-gray-600">Cooperativas Parceiras</p>
+                    </div>
+                </div>
+
+                <div class="bg-cinza-claro rounded-2xl p-6">
+                    <h3 class="text-xl font-header text-cinza-escuro mb-4 flex items-center">
+                        <i data-lucide="trending-up" class="w-5 h-5 mr-2 text-verde-principal"></i>
+                        Ranking Municipal - Kg Doados (Últimos 30 dias)
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between bg-white p-3 rounded-lg">
+                            <div class="flex items-center">
+                                <span class="w-6 h-6 bg-verde-principal text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">1</span>
+                                <span>São Paulo</span>
+                            </div>
+                            <span class="font-bold text-verde-principal">2.8T</span>
+                        </div>
+                        <div class="flex items-center justify-between bg-white p-3 rounded-lg">
+                            <div class="flex items-center">
+                                <span class="w-6 h-6 bg-laranja text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">2</span>
+                                <span>Campinas</span>
+                            </div>
+                            <span class="font-bold text-laranja">1.5T</span>
+                        </div>
+                        <div class="flex items-center justify-between bg-white p-3 rounded-lg">
+                            <div class="flex items-center">
+                                <span class="w-6 h-6 bg-azul-cooperativa text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">3</span>
+                                <span>Santos</span>
+                            </div>
+                            <span class="font-bold text-azul-cooperativa">980Kg</span>
                         </div>
                     </div>
                 </div>
@@ -378,6 +694,29 @@
 
         <section id="doador-dashboard" class="hidden space-y-10 dashboard-enter">
             <h1 class="text-4xl font-header text-cinza-escuro pb-4 border-b border-cinza-medio mb-8">Painel do Doador</h1>
+            
+            <!-- NOVO: SISTEMA DE REPUTAÇÃO E SELOS -->
+            <div class="dashboard-card bg-white p-6 rounded-xl space-y-4 border-t-4 border-verde-principal">
+                <h3 class="text-xl font-header text-cinza-escuro flex items-center">
+                    <i data-lucide="award" class="w-5 h-5 mr-2 text-verde-principal"></i> 
+                    Sua Reputação e Selos
+                </h3>
+                <div class="flex flex-wrap gap-4 items-center">
+                    <div class="sustainability-badge">
+                        <i data-lucide="leaf" class="w-4 h-4"></i>
+                        Selo Verde
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-500 mr-1"></i>
+                        <span class="font-bold mr-1">4.8</span> Avaliação
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i data-lucide="heart" class="w-4 h-4 text-red-500 mr-1"></i>
+                        <span class="font-bold mr-1">98%</span> Taxa de Aceitação
+                    </div>
+                </div>
+            </div>
+
             <div class="grid md:grid-cols-3 gap-8">
                 <div class="dashboard-card bg-white p-6 rounded-xl space-y-4 border-t-4 border-verde-principal">
                     <div class="flex items-center space-x-4">
@@ -391,6 +730,8 @@
                         <i data-lucide="package-open" class="w-5 h-5 inline mr-2"></i> REGISTRAR AGORA
                     </button>
                 </div>
+                
+                <!-- ATUALIZADO: CALCULADORA DE TAXAS DE LOGÍSTICA -->
                 <div class="dashboard-card bg-white p-6 rounded-xl space-y-4 border-t-4 border-laranja">
                      <div class="flex justify-between items-center">
                         <h3 class="text-xl font-header text-cinza-escuro">Status da Coleta</h3>
@@ -400,10 +741,21 @@
                         <p class="text-xs font-medium text-gray-500">Próxima Coleta Agendada:</p>
                         <p class="text-lg font-bold text-laranja">17/Outubro (Hoje)</p>
                     </div>
+                    
+                    <!-- NOVO: CALCULADORA DE TAXAS -->
+                    <div class="taxa-calculator p-3 rounded-lg mt-3">
+                        <p class="text-xs font-medium text-gray-600 mb-2">Estimativa de Taxa:</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm">80kg × R$0,10/kg</span>
+                            <span class="font-bold text-verde-principal">R$ 8,00</span>
+                        </div>
+                    </div>
+                    
                     <a href="#" class="flex items-center text-sm font-medium text-azul-cooperativa hover:underline pt-2">
                         <i data-lucide="map" class="w-4 h-4 inline mr-1"></i> Monitorar em tempo real
                     </a>
                 </div>
+                
                 <div class="dashboard-card bg-white p-6 rounded-xl space-y-4 border-t-4 border-verde-secundario">
                     <div class="flex items-center space-x-4">
                         <div class="p-3 rounded-full bg-verde-secundario/10">
@@ -417,6 +769,41 @@
                     </button>
                 </div>
             </div>
+            
+            <!-- NOVO: SISTEMA DE MATCH AUTOMÁTICO -->
+            <div class="dashboard-card bg-white p-6 rounded-xl space-y-4">
+                <h3 class="text-xl font-header text-cinza-escuro border-b pb-3 flex items-center">
+                    <i data-lucide="users" class="w-5 h-5 mr-2 text-azul-cooperativa"></i> 
+                    Match Automático - Receptores Próximos
+                </h3>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                        <div class="flex items-center">
+                            <span class="match-indicator match-excellent"></span>
+                            <div>
+                                <p class="font-medium">Cozinha Solidária Centro</p>
+                                <p class="text-xs text-gray-600">2km de distância • Capacidade: 100kg</p>
+                            </div>
+                        </div>
+                        <button class="bg-verde-principal text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition">
+                            Selecionar
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-200">
+                        <div class="flex items-center">
+                            <span class="match-indicator match-good"></span>
+                            <div>
+                                <p class="font-medium">ONG Amiga do Bairro</p>
+                                <p class="text-xs text-gray-600">5km de distância • Capacidade: 80kg</p>
+                            </div>
+                        </div>
+                        <button class="bg-laranja text-white px-4 py-2 rounded-lg text-sm hover:bg-orange-600 transition">
+                            Selecionar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <div class="grid lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-2 dashboard-card bg-white p-6 rounded-xl space-y-6">
                     <h3 class="text-xl font-header text-cinza-escuro border-b pb-3 flex items-center">
@@ -472,6 +859,36 @@
                 </div>
             </div>
 
+            <!-- NOVO: RELATÓRIOS ESG -->
+            <div class="dashboard-card bg-white p-6 rounded-xl space-y-4">
+                <h3 class="text-xl font-header text-cinza-escuro border-b pb-3 flex items-center">
+                    <i data-lucide="file-text" class="w-5 h-5 mr-2 text-verde-escuro"></i> 
+                    Relatórios ESG e Fiscais
+                </h3>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="esg-report-card p-4 rounded-lg">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="font-medium text-cinza-escuro">Relatório ESG Trimestral</h4>
+                            <span class="status-badge completed-badge text-xs">Disponível</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Impacto ambiental e social do último trimestre</p>
+                        <button class="w-full bg-verde-principal text-white py-2 px-4 rounded-lg text-sm hover:bg-green-700 transition">
+                            <i data-lucide="download" class="w-4 h-4 inline mr-2"></i> Baixar PDF
+                        </button>
+                    </div>
+                    <div class="esg-report-card p-4 rounded-lg">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="font-medium text-cinza-escuro">Certificado Fiscal</h4>
+                            <span class="status-badge completed-badge text-xs">Disponível</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Comprovante para dedução fiscal</p>
+                        <button class="w-full bg-azul-cooperativa text-white py-2 px-4 rounded-lg text-sm hover:bg-blue-600 transition">
+                            <i data-lucide="file-text" class="w-4 h-4 inline mr-2"></i> Gerar Certificado
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <div class="dashboard-card bg-white p-6 rounded-xl space-y-4">
                 <h3 class="text-xl font-header text-cinza-escuro border-b pb-3 flex items-center">
                     <i data-lucide="history" class="w-5 h-5 mr-2 text-laranja"></i> Histórico de Doações
@@ -485,6 +902,8 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Peso (kg)</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Receptor</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Status</th>
+                                <!-- NOVA COLUNA: VALIDAÇÃO -->
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Validação</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -496,6 +915,12 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                                     <span class="status-badge completed-badge">Entregue</span>
                                 </td>
+                                <!-- NOVO: QR CODE PARA VALIDAÇÃO -->
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <button class="text-azul-cooperativa text-xs hover:underline flex items-center" onclick="showQRValidationModal()">
+                                        <i data-lucide="qrcode" class="w-4 h-4 mr-1"></i> QR Code
+                                    </button>
+                                </td>
                             </tr>
                              <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">15/Out</td>
@@ -505,23 +930,8 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                                     <span class="status-badge bg-azul-cooperativa text-white">Em Rota</span>
                                 </td>
-                            </tr>
-                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">17/Out</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">Laticínios</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">50</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">ONG Esperança</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                    <span class="status-badge pending-badge">Ag. Coleta</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">01/Out</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">Carnes e Aves</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">150</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">Abrigo Municipal</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                    <span class="status-badge completed-badge">Entregue</span>
+                                    <span class="text-gray-400 text-xs">Pendente</span>
                                 </td>
                             </tr>
                         </tbody>
@@ -529,9 +939,43 @@
                 </div>
             </div>
         </section>
-
-        <section id="receptor-dashboard" class="hidden space-y-10 dashboard-enter">
+                <section id="receptor-dashboard" class="hidden space-y-10 dashboard-enter">
             <h1 class="text-4xl font-header text-cinza-escuro pb-4 border-b border-cinza-medio mb-8">Painel do Receptor</h1>
+            
+            <!-- NOVO: SISTEMA DE ROTEIRIZAÇÃO INTELIGENTE -->
+            <div class="dashboard-card bg-white p-6 rounded-xl space-y-4 border-t-4 border-laranja">
+                <h3 class="text-xl font-header text-cinza-escuro border-b pb-3 flex items-center">
+                    <i data-lucide="navigation" class="w-5 h-5 mr-2 text-azul-cooperativa"></i> 
+                    Roteirização Inteligente
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                        <div class="flex items-center">
+                            <i data-lucide="car" class="w-5 h-5 text-azul-cooperativa mr-3"></i>
+                            <div>
+                                <p class="font-medium">Rota Otimizada Disponível</p>
+                                <p class="text-xs text-gray-600">3 coletas • 12km total • 45min estimado</p>
+                            </div>
+                        </div>
+                        <button class="bg-azul-cooperativa text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600 transition">
+                            Ver Rota
+                        </button>
+                    </div>
+                    
+                    <!-- NOVO: INDICADOR DE VEÍCULO PRÓPRIO -->
+                    <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                        <div class="flex items-center">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-verde-principal mr-3"></i>
+                            <div>
+                                <p class="font-medium">Veículo Próprio Detectado</p>
+                                <p class="text-xs text-gray-600">Economia: 100% nas taxas de logística</p>
+                            </div>
+                        </div>
+                        <span class="text-verde-principal font-bold">R$ 0,00</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="dashboard-card grid md:grid-cols-3 gap-6 bg-white p-8 rounded-xl border-t-4 border-laranja">
                  <h3 class="md:col-span-3 text-xl font-header text-cinza-escuro border-b pb-4 mb-4">Nosso Impacto</h3>
                 <div class="text-center">
@@ -547,13 +991,31 @@
                     <p class="text-sm text-gray-500 mt-2">Doadores Parceiros</p>
                 </div>
             </div>
+            
+            <!-- ATUALIZADO: OFERTAS COM SISTEMA DE MATCH MELHORADO -->
             <div class="dashboard-card bg-white p-6 rounded-xl space-y-4">
-                <h3 class="text-xl font-header text-cinza-escuro border-b pb-3">Ofertas de Doação Próximas</h3>
+                <h3 class="text-xl font-header text-cinza-escuro border-b pb-3 flex items-center">
+                    <i data-lucide="package" class="w-5 h-5 mr-2 text-laranja"></i>
+                    Ofertas de Doação - Match Inteligente
+                </h3>
                 <div class="grid md:grid-cols-2 gap-4 pt-4">
                     <div class="border border-laranja/50 rounded-xl p-4 space-y-2 hover:bg-laranja/5 transition hover:shadow-lg">
-                        <p class="text-lg font-medium">Hortifrúti Fresco - 150kg</p>
+                        <div class="flex justify-between items-start">
+                            <p class="text-lg font-medium">Hortifrúti Fresco - 150kg</p>
+                            <span class="match-indicator match-excellent" title="Match Excelente"></span>
+                        </div>
                         <p class="text-sm text-gray-600 flex items-center"><i data-lucide="map-pin" class="w-4 h-4 mr-2"></i>Doador: <span class="font-semibold ml-1">Supermercado Central (5km)</span></p>
                         <p class="text-xs text-gray-500">Validade: 3 dias | Coleta sugerida: 18/Out</p>
+                        
+                        <!-- NOVO: CALCULO AUTOMÁTICO DE TAXA -->
+                        <div class="taxa-calculator p-2 rounded mt-2">
+                            <div class="flex justify-between text-xs">
+                                <span>Taxa de logística:</span>
+                                <span class="font-bold text-verde-principal">R$ 0,00</span>
+                            </div>
+                            <p class="text-xs text-gray-600 mt-1">✓ Veículo próprio detectado</p>
+                        </div>
+                        
                         <div class="flex flex-wrap gap-2 pt-2">
                             <button class="flex-1 bg-laranja text-white py-2 px-3 rounded-lg text-sm cta-btn hover:bg-orange-600 cta-btn-shadow">Aceitar</button>
                             <button class="flex-1 border border-gray-300 text-gray-600 py-2 px-3 rounded-lg text-sm cta-btn hover:bg-cinza-claro">Recusar</button>
@@ -562,10 +1024,24 @@
                             </button>
                         </div>
                     </div>
+                    
                     <div class="border border-laranja/50 rounded-xl p-4 space-y-2 hover:bg-laranja/5 transition hover:shadow-lg">
-                        <p class="text-lg font-medium">Pães e Grãos - 50kg</p>
+                        <div class="flex justify-between items-start">
+                            <p class="text-lg font-medium">Pães e Grãos - 50kg</p>
+                            <span class="match-indicator match-good" title="Match Bom"></span>
+                        </div>
                         <p class="text-sm text-gray-600 flex items-center"><i data-lucide="map-pin" class="w-4 h-4 mr-2"></i>Doador: <span class="font-semibold ml-1">Padaria do Bairro (2km)</span></p>
                         <p class="text-xs text-gray-500">Validade: 1 dia | Coleta sugerida: Hoje</p>
+                        
+                        <!-- NOVO: CALCULO AUTOMÁTICO DE TAXA -->
+                        <div class="taxa-calculator p-2 rounded mt-2">
+                            <div class="flex justify-between text-xs">
+                                <span>Taxa de logística:</span>
+                                <span class="font-bold text-verde-principal">R$ 0,00</span>
+                            </div>
+                            <p class="text-xs text-gray-600 mt-1">✓ Veículo próprio detectado</p>
+                        </div>
+                        
                          <div class="flex flex-wrap gap-2 pt-2">
                            <button class="flex-1 bg-laranja text-white py-2 px-3 rounded-lg text-sm cta-btn hover:bg-orange-600 cta-btn-shadow">Aceitar</button>
                             <button class="flex-1 border border-gray-300 text-gray-600 py-2 px-3 rounded-lg text-sm cta-btn hover:bg-cinza-claro">Recusar</button>
@@ -576,6 +1052,67 @@
                     </div>
                 </div>
             </div>
+
+            <!-- NOVO: SISTEMA DE ASSINATURAS -->
+            <div class="dashboard-card bg-white p-6 rounded-xl space-y-4 border-t-4 border-verde-escuro">
+                <h3 class="text-xl font-header text-cinza-escuro border-b pb-3 flex items-center">
+                    <i data-lucide="crown" class="w-5 h-5 mr-2 text-yellow-500"></i> 
+                    Planos de Assinatura
+                </h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="border-2 border-verde-principal rounded-xl p-6 text-center bg-green-50">
+                        <h4 class="text-lg font-header text-verde-principal mb-2">Plano Básico</h4>
+                        <p class="text-3xl font-bold text-cinza-escuro mb-4">R$ 99<span class="text-lg text-gray-600">/mês</span></p>
+                        <ul class="text-sm text-gray-600 space-y-2 mb-6">
+                            <li class="flex items-center">
+                                <i data-lucide="check" class="w-4 h-4 text-verde-principal mr-2"></i>
+                                Até 50 doações/mês
+                            </li>
+                            <li class="flex items-center">
+                                <i data-lucide="check" class="w-4 h-4 text-verde-principal mr-2"></i>
+                                Relatórios ESG básicos
+                            </li>
+                            <li class="flex items-center">
+                                <i data-lucide="check" class="w-4 h-4 text-verde-principal mr-2"></i>
+                                Suporte por email
+                            </li>
+                        </ul>
+                        <button class="w-full bg-verde-principal text-white py-3 rounded-lg hover:bg-green-700 transition">
+                            Assinar Agora
+                        </button>
+                    </div>
+                    
+                    <div class="border-2 border-laranja rounded-xl p-6 text-center bg-orange-50 relative">
+                        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                            <span class="bg-laranja text-white px-3 py-1 rounded-full text-xs font-bold">POPULAR</span>
+                        </div>
+                        <h4 class="text-lg font-header text-laranja mb-2">Plano Pro</h4>
+                        <p class="text-3xl font-bold text-cinza-escuro mb-4">R$ 299<span class="text-lg text-gray-600">/mês</span></p>
+                        <ul class="text-sm text-gray-600 space-y-2 mb-6">
+                            <li class="flex items-center">
+                                <i data-lucide="check" class="w-4 h-4 text-laranja mr-2"></i>
+                                Doações ilimitadas
+                            </li>
+                            <li class="flex items-center">
+                                <i data-lucide="check" class="w-4 h-4 text-laranja mr-2"></i>
+                                Relatórios ESG avançados
+                            </li>
+                            <li class="flex items-center">
+                                <i data-lucide="check" class="w-4 h-4 text-laranja mr-2"></i>
+                                Suporte prioritário 24/7
+                            </li>
+                            <li class="flex items-center">
+                                <i data-lucide="check" class="w-4 h-4 text-laranja mr-2"></i>
+                                API de integração
+                            </li>
+                        </ul>
+                        <button class="w-full bg-laranja text-white py-3 rounded-lg hover:bg-orange-600 transition">
+                            Assinar Agora
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <div class="dashboard-card bg-white p-6 rounded-xl space-y-4">
                 <h3 class="text-xl font-header text-cinza-escuro border-b pb-3">Histórico de Recebimentos</h3>
                  <div class="overflow-x-auto pt-2">
@@ -587,6 +1124,8 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Peso (kg)</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Status</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Retirada</th>
+                                <!-- NOVA COLUNA: VALIDAÇÃO -->
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Comprovação</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -596,6 +1135,12 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">90</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium"><span class="status-badge completed-badge">Entregue</span></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm"><button class="text-azul-cooperativa text-xs hover:underline">Via Coop.</button></td>
+                                <!-- NOVO: BOTÃO DE VALIDAÇÃO -->
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <button class="text-verde-principal text-xs hover:underline flex items-center" onclick="showDigitalSignatureModal()">
+                                        <i data-lucide="pen-tool" class="w-4 h-4 mr-1"></i> Assinar
+                                    </button>
+                                </td>
                             </tr>
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">01/Out</td>
@@ -603,6 +1148,9 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">220</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium"><span class="status-badge pending-badge">Pendente</span></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm"><button class="text-verde-principal text-xs hover:underline">Agendar Retirada</button></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <span class="text-gray-400 text-xs">-</span>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -612,6 +1160,61 @@
 
         <section id="cooperativa-dashboard" class="hidden space-y-10 dashboard-enter">
             <h1 class="text-4xl font-header text-cinza-escuro pb-4 border-b border-cinza-medio mb-8">Painel da Cooperativa</h1>
+            
+            <!-- NOVO: SISTEMA DE ROTEIRIZAÇÃO AVANÇADA -->
+            <div class="dashboard-card bg-white p-6 rounded-xl space-y-4 border-t-4 border-azul-cooperativa">
+                <h3 class="text-xl font-header text-cinza-escuro border-b pb-3 flex items-center">
+                    <i data-lucide="map" class="w-5 h-5 mr-2 text-azul-cooperativa"></i> 
+                    Roteirização Inteligente
+                </h3>
+                <div class="space-y-4">
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-blue-50 rounded-lg">
+                            <p class="font-medium text-sm mb-2">Rota Otimizada #A23</p>
+                            <div class="space-y-1 text-xs text-gray-600">
+                                <div class="flex justify-between">
+                                    <span>Distância total:</span>
+                                    <span class="font-medium">18km</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Tempo estimado:</span>
+                                    <span class="font-medium">1h 15min</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Coletas:</span>
+                                    <span class="font-medium">3 pontos</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Renda estimada:</span>
+                                    <span class="font-medium text-verde-principal">R$ 67,00</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-green-50 rounded-lg">
+                            <p class="font-medium text-sm mb-2">Eficiência da Rota</p>
+                            <div class="space-y-1 text-xs text-gray-600">
+                                <div class="flex justify-between">
+                                    <span>Otimização:</span>
+                                    <span class="font-medium text-verde-principal">+35%</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Combustível salvo:</span>
+                                    <span class="font-medium">4,2L</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>CO₂ evitado:</span>
+                                    <span class="font-medium">9,8kg</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="w-full bg-azul-cooperativa text-white py-3 rounded-lg hover:bg-blue-600 transition flex items-center justify-center">
+                        <i data-lucide="navigation" class="w-4 h-4 mr-2"></i>
+                        Iniciar Navegação
+                    </button>
+                </div>
+            </div>
+
             <div class="dashboard-card grid md:grid-cols-3 gap-6 bg-white p-8 rounded-xl border-t-4 border-azul-cooperativa">
                  <h3 class="md:col-span-3 text-xl font-header text-cinza-escuro border-b pb-4 mb-4">Performance do Mês</h3>
                 <div class="text-center">
@@ -627,6 +1230,7 @@
                     <p class="text-sm text-gray-500 mt-2">Renda Gerada</p>
                 </div>
             </div>
+            
             <div class="grid lg:grid-cols-2 gap-8">
                 <div class="dashboard-card bg-white p-6 rounded-xl space-y-4">
                     <h3 class="text-xl font-header text-cinza-escuro border-b pb-3">Rotas Disponíveis</h3>
@@ -638,6 +1242,18 @@
                             </div>
                             <p class="text-sm text-gray-600 mt-2">Padaria Doce <i data-lucide="arrow-right" class="inline w-4 h-4"></i> Cozinha Solidária</p>
                             <p class="text-xs text-gray-500 mt-1">Previsão de Renda: R$ 45,00</p>
+                            
+                            <!-- NOVO: DETALHES DE ROTEIRIZAÇÃO -->
+                            <div class="mt-2 p-2 bg-gray-50 rounded text-xs">
+                                <div class="flex justify-between">
+                                    <span>Distância:</span>
+                                    <span class="font-medium">8km</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Otimização:</span>
+                                    <span class="font-medium text-verde-principal">+28%</span>
+                                </div>
+                            </div>
                         </div>
                         <div class="border border-azul-cooperativa/50 rounded-xl p-4 hover:bg-blue-500/5 transition hover:shadow-lg">
                             <div class="flex justify-between items-center">
@@ -646,12 +1262,49 @@
                             </div>
                             <p class="text-sm text-gray-600 mt-2">Hipermercado <i data-lucide="arrow-right" class="inline w-4 h-4"></i> Abrigo + ONG</p>
                             <p class="text-xs text-gray-500 mt-1">Previsão de Renda: R$ 78,00</p>
+                            
+                            <!-- NOVO: DETALHES DE ROTEIRIZAÇÃO -->
+                            <div class="mt-2 p-2 bg-gray-50 rounded text-xs">
+                                <div class="flex justify-between">
+                                    <span>Distância:</span>
+                                    <span class="font-medium">12km</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Otimização:</span>
+                                    <span class="font-medium text-verde-principal">+42%</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+                 
                  <div class="dashboard-card bg-laranja/10 p-6 rounded-xl space-y-4 border border-laranja">
                     <h3 class="text-xl font-header text-cinza-escuro border-b border-laranja/50 pb-3">Sua Rota Atual</h3>
                     <p class="font-medium text-laranja pt-2 text-lg">Próxima Parada (Coleta): Padaria Doce</p>
+                    
+                    <!-- NOVO: SISTEMA DE VALIDAÇÃO EM TEMPO REAL -->
+                    <div class="space-y-3 mt-4">
+                        <div class="flex items-center justify-between p-3 bg-white rounded-lg">
+                            <div class="flex items-center">
+                                <i data-lucide="package" class="w-4 h-4 text-verde-principal mr-2"></i>
+                                <span>Coleta: Padaria Doce</span>
+                            </div>
+                            <button class="bg-verde-principal text-white py-1 px-3 rounded text-xs hover:bg-green-700 transition" onclick="showQRScannerModal()">
+                                <i data-lucide="camera" class="w-3 h-3 inline mr-1"></i> Validar
+                            </button>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-3 bg-white rounded-lg">
+                            <div class="flex items-center">
+                                <i data-lucide="home" class="w-4 h-4 text-azul-cooperativa mr-2"></i>
+                                <span>Entrega: Cozinha Solidária</span>
+                            </div>
+                            <button class="bg-azul-cooperativa text-white py-1 px-3 rounded text-xs hover:bg-blue-600 transition" onclick="showDigitalSignatureModal()">
+                                <i data-lucide="pen-tool" class="w-3 h-3 inline mr-1"></i> Assinar
+                            </button>
+                        </div>
+                    </div>
+                    
                     <div class="flex flex-wrap gap-4 pt-2">
                         <button class="flex-1 bg-verde-principal text-white py-2 px-4 rounded-xl text-sm cta-btn cta-btn-shadow hover:bg-green-700">
                             <i data-lucide="check" class="w-4 h-4 inline mr-1"></i> Confirmar Coleta
@@ -662,6 +1315,48 @@
                     </div>
                 </div>
             </div>
+
+            <!-- NOVO: PAINEL B2B/B2G -->
+            <div class="dashboard-card bg-white p-6 rounded-xl space-y-4 border-t-4 border-verde-escuro">
+                <h3 class="text-xl font-header text-cinza-escuro border-b pb-3 flex items-center">
+                    <i data-lucide="building" class="w-5 h-5 mr-2 text-verde-escuro"></i> 
+                    Painel para Prefeituras (B2G)
+                </h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="p-4 bg-gray-50 rounded-lg">
+                        <h4 class="font-medium text-cinza-escuro mb-3">Dados Municipais</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span>Coletas este mês:</span>
+                                <span class="font-medium">47</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Kg reaproveitados:</span>
+                                <span class="font-medium">1.2T</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Economia em descarte:</span>
+                                <span class="font-medium text-verde-principal">R$ 8.400</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4 bg-gray-50 rounded-lg">
+                        <h4 class="font-medium text-cinza-escuro mb-3">Relatórios Públicos</h4>
+                        <div class="space-y-3">
+                            <button class="w-full bg-verde-principal text-white py-2 px-4 rounded text-sm hover:bg-green-700 transition flex items-center justify-center">
+                                <i data-lucide="download" class="w-4 h-4 mr-2"></i>
+                                Relatório Mensal
+                            </button>
+                            <button class="w-full bg-azul-cooperativa text-white py-2 px-4 rounded text-sm hover:bg-blue-600 transition flex items-center justify-center">
+                                <i data-lucide="bar-chart-3" class="w-4 h-4 mr-2"></i>
+                                Dados para Políticas
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="dashboard-card bg-white p-6 rounded-xl space-y-4">
                 <h3 class="text-xl font-header text-cinza-escuro border-b pb-3">Histórico de Rotas</h3>
                 <div class="overflow-x-auto pt-2">
@@ -673,6 +1368,8 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Kg Coletados</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Renda</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Status</th>
+                                <!-- NOVA COLUNA: EFICIÊNCIA -->
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Eficiência</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -682,6 +1379,10 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">450</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">R$ 130</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium"><span class="status-badge completed-badge">Concluída</span></td>
+                                <!-- NOVO: INDICADOR DE EFICIÊNCIA -->
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <span class="text-verde-principal font-medium">+35%</span>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -691,6 +1392,8 @@
 
         <section id="admin-dashboard" class="hidden space-y-10 dashboard-enter">
             <h1 class="text-4xl font-header text-cinza-escuro pb-4 border-b border-cinza-medio mb-8">Painel Administrativo</h1>
+            
+            <!-- NOVO: MÉTRICAS DE NEGÓCIO EM TEMPO REAL -->
             <div class="dashboard-card grid md:grid-cols-4 gap-6 bg-white p-8 rounded-xl border-t-4 border-cinza-escuro">
                 <div class="text-center">
                     <p class="text-5xl font-header text-verde-principal">350</p>
@@ -709,6 +1412,62 @@
                     <p class="text-sm text-gray-500 mt-2">CO₂ Evitado</p>
                 </div>
             </div>
+
+            <!-- NOVO: RECEITAS E MÉTRICAS FINANCEIRAS -->
+            <div class="dashboard-card bg-white p-6 rounded-xl space-y-4">
+                <h3 class="text-xl font-header text-cinza-escuro border-b pb-3 flex items-center">
+                    <i data-lucide="dollar-sign" class="w-5 h-5 mr-2 text-green-600"></i> 
+                    Métricas Financeiras
+                </h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="text-center p-4 bg-green-50 rounded-lg">
+                        <p class="text-2xl font-header text-green-600" id="revenue-metric">R$ 8.240</p>
+                        <p class="text-sm text-gray-600">Receita Mensal</p>
+                    </div>
+                    <div class="text-center p-4 bg-blue-50 rounded-lg">
+                        <p class="text-2xl font-header text-blue-600" id="cost-savings">R$ 42.500</p>
+                        <p class="text-sm text-gray-600">Economia em Descarte</p>
+                    </div>
+                    <div class="text-center p-4 bg-orange-50 rounded-lg">
+                        <p class="text-2xl font-header text-orange-600">R$ 15.680</p>
+                        <p class="text-sm text-gray-600">Renda Cooperativas</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NOVO: API DE DADOS ESG -->
+            <div class="dashboard-card bg-white p-6 rounded-xl space-y-4">
+                <h3 class="text-xl font-header text-cinza-escuro border-b pb-3 flex items-center">
+                    <i data-lucide="database" class="w-5 h-5 mr-2 text-purple-600"></i> 
+                    API de Dados ESG
+                </h3>
+                <div class="space-y-4">
+                    <p class="text-gray-600">Forneça dados agregados para parceiros corporativos e pesquisadores:</p>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-purple-50 rounded-lg">
+                            <h4 class="font-medium text-purple-700 mb-2">Endpoint de Dados</h4>
+                            <code class="text-sm bg-gray-800 text-green-400 p-2 rounded block">
+                                GET /api/esg-data/company/:id
+                            </code>
+                            <p class="text-xs text-gray-600 mt-2">Retorna dados ESG agregados por empresa</p>
+                        </div>
+                        <div class="p-4 bg-green-50 rounded-lg">
+                            <h4 class="font-medium text-green-700 mb-2">Estatísticas de Uso</h4>
+                            <div class="space-y-1 text-sm">
+                                <div class="flex justify-between">
+                                    <span>Requests hoje:</span>
+                                    <span class="font-medium">1.247</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Parceiros ativos:</span>
+                                    <span class="font-medium">23</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="dashboard-card bg-white p-6 rounded-xl space-y-4">
                 <h3 class="text-xl font-header text-cinza-escuro border-b pb-3">Gerenciar Usuários</h3>
                 <div class="overflow-x-auto pt-2">
@@ -746,6 +1505,7 @@
         </section>
     </main>
     
+    <!-- MODAL DE REGISTRO ATUALIZADO -->
     <div id="registration-modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="modal-content bg-white w-full max-w-lg p-8 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-start mb-6">
@@ -810,11 +1570,30 @@
                 <div class="grid grid-cols-2 gap-4">
                      <div>
                         <label for="alimento-peso" class="block text-md font-header text-gray-700 mb-2">Peso (kg)</label>
-                        <input type="number" id="alimento-peso" placeholder="Aprox." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-verde-principal focus:border-verde-principal">
+                        <input type="number" id="alimento-peso" placeholder="Aprox." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-verde-principal focus:border-verde-principal" oninput="updateTaxaCalculo()">
                     </div>
                     <div>
                         <label for="alimento-validade" class="block text-md font-header text-gray-700 mb-2">Validade</label>
                         <input type="date" id="alimento-validade" class="w-full p-3 border border-gray-300 rounded-lg text-gray-500 focus:ring-verde-principal focus:border-verde-principal">
+                    </div>
+                </div>
+                
+                <!-- NOVO: CALCULADORA DE TAXA EM TEMPO REAL -->
+                <div id="taxa-calculator-container" class="taxa-calculator p-4 rounded-lg hidden">
+                    <h4 class="font-medium text-gray-700 mb-2">Estimativa de Taxa de Logística</h4>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span>Peso informado:</span>
+                            <span id="taxa-peso">0 kg</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Taxa base (R$0,10/kg):</span>
+                            <span id="taxa-base">R$ 0,00</span>
+                        </div>
+                        <div class="flex justify-between font-bold border-t pt-2">
+                            <span>Total estimado:</span>
+                            <span id="taxa-total" class="text-verde-principal">R$ 0,00</span>
+                        </div>
                     </div>
                 </div>
                 
@@ -862,6 +1641,70 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- NOVO MODAL: VALIDAÇÃO COM QR CODE -->
+    <div id="qr-validation-modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="modal-content bg-white w-full max-w-md p-8 rounded-2xl shadow-2xl">
+            <div class="flex justify-between items-start mb-6">
+                <h2 class="text-2xl font-header text-verde-principal flex items-center">
+                    <i data-lucide="qrcode" class="w-7 h-7 mr-3"></i> Validação QR Code
+                </h2>
+                <button class="text-gray-400 hover:text-gray-600" onclick="hideQRValidationModal()">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            
+            <div class="qr-scanner-container text-center py-8">
+                <i data-lucide="camera" class="w-16 h-16 text-gray-400 mx-auto mb-4"></i>
+                <p class="text-gray-600 mb-4">Aponte a câmera para o QR Code da doação</p>
+                <button class="bg-verde-principal text-white py-3 px-6 rounded-lg hover:bg-green-700 transition">
+                    <i data-lucide="scan" class="w-4 h-4 inline mr-2"></i> Iniciar Scanner
+                </button>
+            </div>
+            
+            <div class="mt-6 p-4 bg-green-50 rounded-lg hidden" id="qr-success">
+                <div class="flex items-center">
+                    <i data-lucide="check-circle" class="w-5 h-5 text-verde-principal mr-2"></i>
+                    <span class="text-sm text-gray-700">Doação validada com sucesso!</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOVO MODAL: ASSINATURA DIGITAL -->
+    <div id="digital-signature-modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="modal-content bg-white w-full max-w-2xl p-8 rounded-2xl shadow-2xl">
+            <div class="flex justify-between items-start mb-6">
+                <h2 class="text-2xl font-header text-azul-cooperativa flex items-center">
+                    <i data-lucide="pen-tool" class="w-7 h-7 mr-3"></i> Assinatura Digital
+                </h2>
+                <button class="text-gray-400 hover:text-gray-600" onclick="hideDigitalSignatureModal()">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-6">
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <h4 class="font-medium text-gray-700 mb-2">Doação: Hortifrúti Fresco - 150kg</h4>
+                    <p class="text-sm text-gray-600">Doador: Supermercado Central</p>
+                    <p class="text-sm text-gray-600">Receptor: Cozinha Solidária</p>
+                </div>
+                
+                <div class="border-2 border-dashed border-gray-300 rounded-lg h-48 flex items-center justify-center">
+                    <p class="text-gray-500">Assine na área acima para confirmar o recebimento</p>
+                </div>
+                
+                <div class="flex justify-between items-center">
+                    <button class="text-gray-600 hover:text-gray-800">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4 inline mr-1"></i> Limpar
+                    </button>
+                    <button class="bg-azul-cooperativa text-white py-3 px-6 rounded-lg hover:bg-blue-600 transition">
+                        <i data-lucide="check" class="w-4 h-4 inline mr-2"></i> Confirmar Assinatura
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -980,6 +1823,8 @@
         const metricFamilies = document.getElementById('metric-families');
         const registrationModal = document.getElementById('registration-modal');
         const offerDetailsModal = document.getElementById('offer-details-modal');
+        const qrValidationModal = document.getElementById('qr-validation-modal');
+        const digitalSignatureModal = document.getElementById('digital-signature-modal');
         let selectedUserType = 'doador';
         const userConfig = {
             'doador': { color: 'bg-verde-principal', text: 'Doador', hover: 'hover:bg-green-700', placeholder: 'Nome da Empresa / Estabelecimento', shadow: '0 10px 20px rgba(76, 175, 80, 0.4)', border: '#4CAF50' },
@@ -988,6 +1833,50 @@
         };
         let charts = {};
 
+        // NOVAS FUNÇÕES PARA AS FUNCIONALIDADES ADICIONADAS
+        function updateTaxaCalculo() {
+            const pesoInput = document.getElementById('alimento-peso');
+            const taxaContainer = document.getElementById('taxa-calculator-container');
+            const taxaPeso = document.getElementById('taxa-peso');
+            const taxaBase = document.getElementById('taxa-base');
+            const taxaTotal = document.getElementById('taxa-total');
+            
+            if (pesoInput.value > 0) {
+                const peso = parseFloat(pesoInput.value);
+                const taxa = Math.max(5, peso * 0.10); // R$5 mínimo ou R$0,10/kg
+                
+                taxaPeso.textContent = peso + ' kg';
+                taxaBase.textContent = 'R$ ' + (peso * 0.10).toFixed(2);
+                taxaTotal.textContent = 'R$ ' + taxa.toFixed(2);
+                taxaContainer.classList.remove('hidden');
+            } else {
+                taxaContainer.classList.add('hidden');
+            }
+        }
+
+        function showQRValidationModal() {
+            qrValidationModal.classList.add('open');
+            lucide.createIcons();
+        }
+
+        function hideQRValidationModal() {
+            qrValidationModal.classList.remove('open');
+        }
+
+        function showDigitalSignatureModal() {
+            digitalSignatureModal.classList.add('open');
+            lucide.createIcons();
+        }
+
+        function hideDigitalSignatureModal() {
+            digitalSignatureModal.classList.remove('open');
+        }
+
+        function showQRScannerModal() {
+            showQRValidationModal();
+        }
+
+        // FUNÇÕES EXISTENTES (mantidas do código original)
         function applyTransition(element, activate) {
             if (activate) {
                 element.classList.remove('hidden');
@@ -1074,39 +1963,59 @@
 
         let isLoggedIn = false;
         let currentUserRole = 'doador';
-        function toggleDashboard() {
-            if (isLoggedIn) {
-                isLoggedIn = false;
-                showSection('home');
-            } else {
-                currentUserRole = selectedUserType; 
-                isLoggedIn = true;
-                const email = document.querySelector('#login-form input[type="email"]').value;
-                if (email === "admin@reaproveita.com") {
-                    currentUserRole = 'admin';
-                }
-                landingPage.classList.add('hidden');
-                cadastroSection.classList.add('hidden');
-                Object.values(dashboards).forEach(d => {
-                    d.classList.add('hidden');
-                    d.classList.remove('active');
-                });
-                if (dashboards[currentUserRole]) {
-                    const activeDashboard = dashboards[currentUserRole];
-                    activeDashboard.classList.remove('hidden');
-                    setTimeout(() => {
-                        activeDashboard.classList.add('active');
-                        lucide.createIcons();
-                        if (currentUserRole === 'doador') {
-                           initDonorCharts();
-                        }
-                    }, 50);
-                    loginBtn.textContent = `Logout (${currentUserRole.charAt(0).toUpperCase() + currentUserRole.slice(1)})`;
-                    loginBtn.onclick = toggleDashboard; 
-                }
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
+    function toggleDashboard() {
+    // Só faz login se já estiver na tela de cadastro e o usuário clicar em "Entrar"
+    if (isLoggedIn) {
+        // Logout - volta para a home
+        isLoggedIn = false;
+        showSection('home');
+        updateLoginButton();
+    } else {
+        // Login - verifica se está na tela de cadastro
+        const email = document.querySelector('#login-form input[type="email"]').value;
+        const password = document.querySelector('#login-form input[type="password"]').value;
+        
+        // Simulação de login - só funciona se estiver na tela de cadastro
+        if (cadastroSection.classList.contains('hidden')) {
+            // Se não está na tela de cadastro, vai para ela
+            showLoginScreen();
+            return;
         }
+        
+        // Se está na tela de cadastro, faz o login
+        currentUserRole = selectedUserType; 
+        
+        // Verificação para admin
+        if (email === "admin@reaproveita.com") {
+            currentUserRole = 'admin';
+        }
+        
+        isLoggedIn = true;
+        
+        // Esconde tudo e mostra o dashboard correto
+        landingPage.classList.add('hidden');
+        cadastroSection.classList.add('hidden');
+        Object.values(dashboards).forEach(d => {
+            d.classList.add('hidden');
+            d.classList.remove('active');
+        });
+        
+        if (dashboards[currentUserRole]) {
+            const activeDashboard = dashboards[currentUserRole];
+            activeDashboard.classList.remove('hidden');
+            setTimeout(() => {
+                activeDashboard.classList.add('active');
+                lucide.createIcons();
+                if (currentUserRole === 'doador') {
+                   initDonorCharts();
+                }
+            }, 50);
+        }
+        
+        updateLoginButton();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+}
         
         function scrollToElement(id) {
             const element = document.getElementById(id);
@@ -1267,6 +2176,100 @@
             });
         }
         
+        // Funções para o menu mobile
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const isHidden = mobileMenu.classList.contains('hidden');
+            
+            if (isHidden) {
+                mobileMenu.classList.remove('hidden');
+                setTimeout(() => {
+                    mobileMenu.style.opacity = '1';
+                    mobileMenu.style.transform = 'translateY(0)';
+                }, 10);
+            } else {
+                mobileMenu.style.opacity = '0';
+                mobileMenu.style.transform = 'translateY(-10px)';
+                setTimeout(() => {
+                    mobileMenu.classList.add('hidden');
+                }, 300);
+            }
+            lucide.createIcons();
+        }
+
+        function hideMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.style.opacity = '0';
+            mobileMenu.style.transform = 'translateY(-10px)';
+            setTimeout(() => {
+                mobileMenu.classList.add('hidden');
+            }, 300);
+        }
+
+        // Efeito de scroll no header
+        let lastScrollTop = 0;
+        const header = document.querySelector('header');
+
+        window.addEventListener('scroll', function() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (scrollTop > 100) {
+                header.classList.add('header-scrolled');
+            } else {
+                header.classList.remove('header-scrolled');
+            }
+            
+            lastScrollTop = scrollTop;
+        });
+
+        // Atualizar texto do botão login baseado no estado
+        function updateLoginButton() {
+            const loginBtn = document.getElementById('login-btn');
+            const loginBtnMobile = document.getElementById('login-btn-mobile');
+            
+            if (isLoggedIn) {
+                // Desktop
+                loginBtn.innerHTML = `
+                    <span class="relative z-10 flex items-center">
+                        <i data-lucide="log-out" class="w-4 h-4 mr-2"></i>
+                        Logout (${currentUserRole.charAt(0).toUpperCase() + currentUserRole.slice(1)})
+                    </span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-verde-escuro to-verde-principal opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                `;
+                // Mobile
+                if (loginBtnMobile) {
+                    loginBtnMobile.innerHTML = `
+                        <i data-lucide="log-out" class="w-5 h-5 mr-3"></i>
+                        Logout (${currentUserRole.charAt(0).toUpperCase() + currentUserRole.slice(1)})
+                    `;
+                }
+            } else {
+                // Desktop
+                loginBtn.innerHTML = `
+                    <span class="relative z-10 flex items-center">
+                        <i data-lucide="log-in" class="w-4 h-4 mr-2"></i>
+                        Login
+                    </span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-verde-escuro to-verde-principal opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                `;
+                // Mobile
+                if (loginBtnMobile) {
+                    loginBtnMobile.innerHTML = `
+                        <i data-lucide="log-in" class="w-5 h-5 mr-3"></i>
+                        Login
+                    `;
+                }
+            }
+            lucide.createIcons();
+        }
+
+        // Atualize a função toggleDashboard para chamar updateLoginButton
+        const originalToggleDashboard = toggleDashboard;
+        toggleDashboard = function() {
+            originalToggleDashboard();
+            setTimeout(updateLoginButton, 100);
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
              showSection('home');
              selectUserType('doador');
@@ -1286,7 +2289,31 @@
                 }
             });
         });
+        // NOVA FUNÇÃO: Mostrar tela de login/cadastro
+function showLoginScreen() {
+    // Esconde todas as seções
+    landingPage.classList.add('hidden');
+    Object.values(dashboards).forEach(d => {
+        d.classList.add('hidden');
+        d.classList.remove('active');
+    });
+    
+    // Mostra a seção de cadastro/login
+    cadastroSection.classList.remove('hidden');
+    
+    // Garante que o formulário de login está visível
+    showLogin(false);
+    
+    // Reseta para doador como padrão
+    selectUserType('doador');
+    
+    // Atualiza o botão de login no header
+    loginBtn.textContent = 'Login';
+    loginBtn.onclick = showLoginScreen;
+    
+    // Scroll para o topo
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
     </script>
 </body>
 </html>
-
