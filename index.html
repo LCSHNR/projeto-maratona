@@ -1,0 +1,1292 @@
+<!-- Chosen Palette: Verde Sustentável (Baseado em verde-principal, laranja, azul-cooperativa e tons de cinza) -->
+<!-- Application Structure Plan: A arquitetura da aplicação foi desenhada para separar claramente a experiência pública da privada. Inicia-se com uma landing page informativa que detalha a proposta de valor e o impacto do projeto, guiando o usuário para um portal de cadastro/login unificado. Após a autenticação (simulada), o usuário é direcionado a um dashboard específico para sua função (Doador, Receptor, Cooperativa, Admin). Essa abordagem baseada em papéis é crucial para a usabilidade, pois cada perfil possui tarefas e métricas distintas. A estrutura evita sobrecarga de informação e otimiza o fluxo de trabalho, apresentando apenas as ferramentas e dados relevantes para cada tipo de usuário. -->
+<!-- Visualization & Content Choices: 
+- Informação: Crescimento de doações do usuário. -> Objetivo: Mostrar mudança/tendência. -> Visualização: Gráfico de Linhas Interativo. -> Interação: Tooltip ao passar o mouse sobre os pontos de dados. -> Justificativa: Visualiza de forma clara e motivadora o impacto contínuo do doador ao longo do tempo. -> Biblioteca: Chart.js (Canvas).
+- Informação: Progresso de metas de gamificação (ex: 6/10 doações). -> Objetivo: Informar proporção/progresso. -> Visualização: Gráfico de Rosca (Doughnut Chart). -> Interação: Visual estático, mas informativo. -> Justificativa: Substitui o SVG estático por uma renderização em Canvas, cumprindo os requisitos técnicos e oferecendo uma representação visual clara do progresso para a meta. -> Biblioteca: Chart.js (Canvas).
+- Informação: Monitoramento de rotas ativas (Admin). -> Objetivo: Organizar/Monitorar. -> Visualização: Lista Estruturada com Indicadores de Status. -> Interação: N/A. -> Justificativa: Troca um placeholder de mapa (tecnicamente inviável sob as restrições) por uma lista de rotas em tempo real, que é mais prática, clara e viável para monitoramento operacional. -> Biblioteca: HTML/Tailwind CSS. -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reaproveita+ | Dashboards Multifuncionais</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'verde-principal': '#4CAF50',
+                        'verde-secundario': '#81C784',
+                        'verde-escuro': '#388E3C',
+                        'laranja': '#FFA726',
+                        'azul-cooperativa': '#42A5F5',
+                        'cinza-claro': '#F5F5F5',
+                        'cinza-medio': '#E0E0E0',
+                        'cinza-escuro': '#333333',
+                    },
+                    fontFamily: {
+                        'montserrat': ['Montserrat', 'sans-serif'],
+                        'roboto': ['Roboto', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        'xl': '12px',
+                        '2xl': '16px',
+                        '3xl': '30px',
+                    },
+                    keyframes: {
+                        pulse: {
+                            '0%, 100%': { opacity: 1 },
+                            '50%': { opacity: 0.8 },
+                        },
+                         spin: {
+                            '0%': { transform: 'rotate(0deg)' },
+                            '100%': { transform: 'rotate(360deg)' },
+                        }
+                    },
+                    animation: {
+                        pulse: 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        spin: 'spin 1s linear infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'roboto', sans-serif;
+            color: theme('colors.cinza-escuro');
+            background-color: theme('colors.cinza-claro');
+        }
+        h1, h2, h3, h4, .font-header {
+            font-family: 'montserrat', sans-serif;
+            font-weight: 800;
+        }
+        .cta-btn {
+            font-family: 'montserrat', sans-serif;
+            font-weight: 500;
+        }
+        a, button, .feature-card, .user-type-btn, .dashboard-card {
+            transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .cta-btn-shadow {
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            transform: translateY(0);
+        }
+        .cta-btn-shadow:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+            transform: translateY(-3px);
+        }
+        .feature-card:hover {
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            transform: translateY(-8px);
+        }
+        [lucide] {
+            stroke-width: 2.5;
+        }
+        .form-transition {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+        }
+        .form-transition.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .dashboard-enter {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .dashboard-enter.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .status-badge {
+            padding: 2px 10px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: inline-block;
+        }
+        .pending-badge {
+            background-color: theme('colors.laranja');
+            color: white;
+        }
+        .completed-badge {
+            background-color: theme('colors.verde-principal');
+            color: white;
+        }
+        .dashboard-card {
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            border: 1px solid theme('colors.cinza-medio');
+        }
+        .dashboard-card:hover {
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            transform: translateY(-5px);
+        }
+        .interactive-table thead th {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background-color: theme('colors.cinza-claro');
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+        .interactive-table tbody tr {
+            border-bottom: 1px solid theme('colors.cinza-medio');
+            transition: all 0.2s ease-in-out;
+        }
+        .interactive-table tbody tr:last-child {
+            border-bottom: none;
+        }
+        .interactive-table tbody tr:hover {
+            background-color: theme('colors.verde-principal / 8%');
+            transform: scale(1.02);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .interactive-table tbody td {
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(2px);
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            pointer-events: none;
+        }
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            transform: scale(0.95) translateY(-20px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .modal-overlay.open .modal-content {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 250px;
+            max-height: 300px;
+        }
+         @media (min-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <header class="sticky top-0 z-50 bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="#home" class="text-2xl font-header text-verde-principal tracking-wider flex items-center" onclick="showSection('home')">
+                    <i data-lucide="leaf" class="w-6 h-6 mr-1 text-verde-principal"></i>
+                    Reaproveita+
+                </a>
+                <nav class="hidden md:flex space-x-8 cta-btn">
+                    <a href="#home" class="text-cinza-escuro hover:text-verde-principal transition" onclick="showSection('home')">Home</a>
+                    <a href="#como-funciona" class="text-cinza-escuro hover:text-verde-principal transition" onclick="scrollToElement('como-funciona')">Como Funciona</a>
+                    <a href="#impacto" class="text-cinza-escuro hover:text-verde-principal transition" onclick="scrollToElement('impacto')">Impacto</a>
+                    <a href="#" onclick="showSection('cadastro');" class="text-cinza-escuro hover:text-verde-principal transition">Cadastre-se</a>
+                </nav>
+                <div class="flex items-center space-x-4">
+                    <button id="login-btn" class="cta-btn text-sm font-medium text-cinza-escuro hover:text-verde-principal transition" onclick="toggleDashboard()">
+                        Login
+                    </button>
+                    <button class="md:hidden p-2 rounded-lg hover:bg-cinza-claro transition">
+                        <i data-lucide="menu" class="w-6 h-6 text-cinza-escuro"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <section id="landing-page" class="space-y-20">
+            <section id="home" class="relative bg-gradient-to-br from-white to-verde-secundario/10 shadow-2xl rounded-[30px] overflow-hidden p-8 lg:p-20 border border-verde-secundario/50">
+                <div class="lg:flex lg:items-center lg:justify-between">
+                    <div class="lg:w-1/2 space-y-6">
+                        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-header text-cinza-escuro leading-tight">
+                            Transformando desperdício em <span class="text-verde-principal font-extrabold">impacto real</span>.
+                        </h1>
+                        <p class="text-lg text-gray-700 font-roboto lg:text-xl">
+                            Conectamos doadores de alimentos com cooperativas e receptores, gerando sustentabilidade e nutrição para quem precisa.
+                        </p>
+                        <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 pt-8">
+                            <button class="btn-principal cta-btn text-white py-3 px-8 rounded-full shadow-lg cta-btn-shadow bg-verde-principal" onclick="showSection('cadastro')">
+                                <i data-lucide="heart" class="w-5 h-5 inline mr-2"></i> Quero Doar
+                            </button>
+                            <button class="bg-laranja cta-btn text-white py-3 px-8 rounded-full shadow-lg hover:bg-orange-600 cta-btn-shadow" onclick="showSection('cadastro')">
+                                <i data-lucide="download" class="w-5 h-5 inline mr-2"></i> Quero Receber
+                            </button>
+                        </div>
+                    </div>
+                    <div class="lg:w-1/2 mt-10 lg:mt-0 flex justify-center lg:justify-end">
+                        <div class="w-full max-w-xs h-72 lg:h-96 bg-verde-secundario rounded-3xl p-6 shadow-2xl transform rotate-3 hover:rotate-0 transition duration-500 flex items-center justify-center relative overflow-hidden">
+                            <div class="absolute w-40 h-40 bg-white/20 rounded-full -top-10 -left-10"></div>
+                            <div class="absolute w-24 h-24 bg-white/20 rounded-full -bottom-10 -right-10"></div>
+                            <div class="text-white text-center text-xl font-header space-y-4 z-10">
+                                <i data-lucide="network" class="w-10 h-10 mx-auto"></i>
+                                <p>Rede de Resgate Alimentar</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="como-funciona" class="text-center space-y-12 bg-white rounded-3xl p-8 shadow-xl">
+                <h2 class="text-4xl font-header text-cinza-escuro">O Ciclo do <span class="text-verde-principal">Reaproveita+</span></h2>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="bg-cinza-claro p-8 rounded-2xl shadow-lg space-y-4 feature-card">
+                        <i data-lucide="package-open" class="w-12 h-12 mx-auto text-verde-principal bg-verde-principal/10 p-2 rounded-full"></i>
+                        <h3 class="text-2xl font-header">1. Doação</h3>
+                        <p class="text-gray-700 font-roboto">O Doador registra o tipo, peso, validade e foto dos alimentos disponíveis na plataforma.</p>
+                    </div>
+                    <div class="bg-cinza-claro p-8 rounded-2xl shadow-lg space-y-4 feature-card">
+                        <i data-lucide="truck" class="w-12 h-12 mx-auto text-azul-cooperativa bg-azul-cooperativa/10 p-2 rounded-full"></i>
+                        <h3 class="text-2xl font-header">2. Logística</h3>
+                        <p class="text-gray-700 font-roboto">A Cooperativa parceira ou Transportador é acionado para a coleta agendada e otimizada.</p>
+                    </div>
+                    <div class="bg-cinza-claro p-8 rounded-2xl shadow-lg space-y-4 feature-card">
+                        <i data-lucide="hand-heart" class="w-12 h-12 mx-auto text-laranja bg-laranja/10 p-2 rounded-full"></i>
+                        <h3 class="text-2xl font-header">3. Recepção</h3>
+                        <p class="text-gray-700 font-roboto">Alimentos frescos são entregues ao Receptor (ONGs, Cozinhas) para geração de refeições.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="impacto" class="space-y-12 bg-verde-escuro p-10 rounded-3xl shadow-2xl text-white">
+                <h2 class="text-4xl font-header text-center">Impacto que <span class="text-laranja">Transforma</span> Vidas</h2>
+                <div class="grid md:grid-cols-3 gap-6 text-center">
+                    <div class="p-6 bg-white/10 rounded-xl border border-white/20 backdrop-blur-sm">
+                        <i data-lucide="scale" class="w-10 h-10 mx-auto text-verde-secundario mb-3"></i>
+                        <p class="text-5xl font-header text-verde-secundario" id="metric-kg">0</p>
+                        <p class="text-sm font-medium opacity-80 mt-2">Kg de alimentos doados</p>
+                    </div>
+                    <div class="p-6 bg-white/10 rounded-xl border border-white/20 backdrop-blur-sm">
+                        <i data-lucide="cloud-off" class="w-10 h-10 mx-auto text-laranja mb-3"></i>
+                        <p class="text-5xl font-header text-laranja" id="metric-co2">0</p>
+                        <p class="text-sm font-medium opacity-80 mt-2">Ton. de CO₂ evitadas</p>
+                    </div>
+                    <div class="p-6 bg-white/10 rounded-xl border border-white/20 backdrop-blur-sm">
+                        <i data-lucide="users" class="w-10 h-10 mx-auto text-azul-cooperativa mb-3"></i>
+                        <p class="text-5xl font-header text-azul-cooperativa" id="metric-families">0</p>
+                        <p class="text-sm font-medium opacity-80 mt-2">Famílias com nutrição</p>
+                    </div>
+                </div>
+                <div class="text-center pt-6 text-white/70 text-sm italic">
+                    <p>Dados atualizados em tempo real pela nossa rede.</p>
+                </div>
+            </section>
+        </section>
+        
+        <section id="cadastro" class="hidden min-h-[60vh] flex items-center justify-center">
+            <div class="w-full max-w-lg bg-white p-8 rounded-xl shadow-2xl space-y-6">
+                <h2 class="text-3xl font-header text-cinza-escuro text-center mb-6" id="auth-title">Faça Login ou Cadastre-se</h2>
+                
+                <p class="text-center text-gray-600 font-medium">Eu sou:</p>
+                <div class="flex justify-center space-x-2 sm:space-x-4 mb-6">
+                    <button id="btn-doador" class="user-type-btn flex flex-col items-center justify-center w-1/3 p-3 rounded-xl bg-verde-principal text-white cta-btn" onclick="selectUserType('doador')">
+                        <i data-lucide="leaf" class="w-6 h-6 mb-1"></i> Doador
+                    </button>
+                    <button id="btn-receptor" class="user-type-btn flex flex-col items-center justify-center w-1/3 p-3 rounded-xl bg-laranja text-white cta-btn" onclick="selectUserType('receptor')">
+                        <i data-lucide="hand-heart" class="w-6 h-6 mb-1"></i> Receptor
+                    </button>
+                    <button id="btn-cooperativa" class="user-type-btn flex flex-col items-center justify-center w-1/3 p-3 rounded-xl bg-azul-cooperativa text-white cta-btn" onclick="selectUserType('cooperativa')">
+                        <i data-lucide="truck" class="w-6 h-6 mb-1"></i> Cooperativa
+                    </button>
+                </div>
+                <p id="admin-notice" class="text-center text-xs text-red-500 hidden mt-2">Para simular o login Admin, use as credenciais de teste e clique em "Entrar".</p>
+                
+                <div id="login-form" class="form-transition">
+                    <div class="relative mb-4">
+                        <i data-lucide="mail" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                        <input type="email" placeholder="Email (Login)" class="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-verde-principal focus:border-verde-principal">
+                    </div>
+                    <div class="relative mb-2">
+                        <i data-lucide="lock" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                        <input type="password" placeholder="Senha" class="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-verde-principal focus:border-verde-principal">
+                    </div>
+                    
+                    <div class="text-right text-sm mb-6">
+                        <a href="#" class="text-verde-principal hover:underline">Esqueci minha senha</a>
+                    </div>
+                    <button id="login-btn-submit" class="w-full py-3 rounded-xl bg-verde-principal text-white cta-btn transition duration-300 cta-btn-shadow" onclick="toggleDashboard()">Entrar</button>
+                    <p class="text-center text-gray-500 my-4">ou</p>
+                    <button class="w-full py-2 mb-2 rounded-xl border border-gray-300 bg-white text-cinza-escuro cta-btn flex items-center justify-center hover:bg-cinza-claro transition">
+                        <i data-lucide="mail" class="w-5 h-5 mr-2"></i> Entrar com Google
+                    </button>
+                    <button class="w-full py-2 rounded-xl border border-gray-300 bg-white text-cinza-escuro cta-btn flex items-center justify-center hover:bg-cinza-claro transition">
+                        <i data-lucide="facebook" class="w-5 h-5 mr-2"></i> Entrar com Facebook
+                    </button>
+                    <div class="text-center text-sm mt-6">
+                        Não tem conta? <a href="#" onclick="showSignup()" class="text-verde-principal font-medium hover:underline">Cadastre-se aqui</a>
+                    </div>
+                </div>
+                <div id="signup-form" class="form-transition hidden">
+                    <h3 class="text-xl font-header text-cinza-escuro mb-4" id="signup-header">Cadastro de Doador</h3>
+                    <form class="space-y-4">
+                        <div class="relative">
+                            <i data-lucide="user" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                            <input type="text" id="signup-nome" placeholder="Nome Completo / Nome da Empresa" required class="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-verde-principal focus:border-verde-principal">
+                        </div>
+                        <div class="relative">
+                            <i data-lucide="building" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                            <input type="text" id="signup-tipo" placeholder="Tipo de Estabelecimento / Instituição / Veículo" required class="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-verde-principal focus:border-verde-principal">
+                        </div>
+                        <div class="relative">
+                            <i data-lucide="map-pin" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                            <input type="text" id="signup-endereco" placeholder="Endereço Completo" required class="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-verde-principal focus:border-verde-principal">
+                        </div>
+                        <div class="relative">
+                            <i data-lucide="phone" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                            <input type="tel" id="signup-contato" placeholder="Telefone de Contato" required class="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-verde-principal focus:border-verde-principal">
+                        </div>
+                        <div class="relative">
+                            <i data-lucide="mail" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                            <input type="email" id="signup-email" placeholder="Email (Login)" required class="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-verde-principal focus:border-verde-principal">
+                        </div>
+                        <div class="relative">
+                            <i data-lucide="lock" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                            <input type="password" id="signup-senha" placeholder="Senha" required class="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-verde-principal focus:border-verde-principal">
+                        </div>
+                        <button type="submit" id="signup-btn-submit" class="w-full py-3 rounded-xl bg-verde-principal text-white cta-btn hover:bg-green-700 transition cta-btn-shadow" onclick="event.preventDefault(); showLogin();">
+                            Finalizar Cadastro
+                        </button>
+                    </form>
+                    <div class="text-center text-sm mt-6">
+                        Já tem conta? <a href="#" onclick="showLogin()" class="text-verde-principal font-medium hover:underline">Fazer Login</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="doador-dashboard" class="hidden space-y-10 dashboard-enter">
+            <h1 class="text-4xl font-header text-cinza-escuro pb-4 border-b border-cinza-medio mb-8">Painel do Doador</h1>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="dashboard-card bg-white p-6 rounded-xl space-y-4 border-t-4 border-verde-principal">
+                    <div class="flex items-center space-x-4">
+                         <div class="p-3 rounded-full bg-verde-principal/10">
+                            <i data-lucide="plus-circle" class="w-8 h-8 text-verde-principal"></i>
+                        </div>
+                        <h3 class="text-xl font-header text-cinza-escuro">Nova Doação</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 pt-4">Inicie o processo de registro de alimentos para coleta.</p>
+                    <button class="w-full cta-btn text-white py-3 px-4 rounded-xl shadow-lg cta-btn-shadow bg-verde-principal" onclick="showRegistrationModal()">
+                        <i data-lucide="package-open" class="w-5 h-5 inline mr-2"></i> REGISTRAR AGORA
+                    </button>
+                </div>
+                <div class="dashboard-card bg-white p-6 rounded-xl space-y-4 border-t-4 border-laranja">
+                     <div class="flex justify-between items-center">
+                        <h3 class="text-xl font-header text-cinza-escuro">Status da Coleta</h3>
+                        <span class="status-badge pending-badge">PENDENTE</span>
+                    </div>
+                    <div class="space-y-1 pt-4">
+                        <p class="text-xs font-medium text-gray-500">Próxima Coleta Agendada:</p>
+                        <p class="text-lg font-bold text-laranja">17/Outubro (Hoje)</p>
+                    </div>
+                    <a href="#" class="flex items-center text-sm font-medium text-azul-cooperativa hover:underline pt-2">
+                        <i data-lucide="map" class="w-4 h-4 inline mr-1"></i> Monitorar em tempo real
+                    </a>
+                </div>
+                <div class="dashboard-card bg-white p-6 rounded-xl space-y-4 border-t-4 border-verde-secundario">
+                    <div class="flex items-center space-x-4">
+                        <div class="p-3 rounded-full bg-verde-secundario/10">
+                            <i data-lucide="credit-card" class="w-8 h-8 text-verde-secundario"></i>
+                        </div>
+                        <h3 class="text-xl font-header text-cinza-escuro">Pagamentos</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 pt-4">Taxa de Logística (ref. 10/Out): <span class="text-lg font-bold text-verde-principal">R$ 15,00</span></p>
+                    <button class="w-full cta-btn text-white bg-verde-secundario py-3 px-4 rounded-xl shadow-lg hover:bg-green-600 transition duration-300">
+                         <i data-lucide="wallet" class="w-5 h-5 inline mr-2"></i> PAGAR AGORA
+                    </button>
+                </div>
+            </div>
+            <div class="grid lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 dashboard-card bg-white p-6 rounded-xl space-y-6">
+                    <h3 class="text-xl font-header text-cinza-escuro border-b pb-3 flex items-center">
+                        <i data-lucide="trending-up" class="w-5 h-5 mr-2 text-verde-principal"></i> Seu Impacto Pessoal
+                    </h3>
+                    <div class="grid grid-cols-3 divide-x divide-gray-200">
+                        <div class="text-center p-2">
+                            <p class="text-5xl font-header text-verde-principal animate-pulse">2.1K</p>
+                            <p class="text-sm text-gray-500">Kg doados</p>
+                        </div>
+                        <div class="text-center p-2">
+                            <p class="text-5xl font-header text-laranja animate-pulse">1.5</p>
+                            <p class="text-sm text-gray-500">Ton. CO₂ evitadas</p>
+                        </div>
+                        <div class="text-center p-2">
+                            <p class="text-5xl font-header text-azul-cooperativa animate-pulse">52</p>
+                            <p class="text-sm text-gray-500">Famílias atendidas</p>
+                        </div>
+                    </div>
+                    <div class="chart-container pt-4">
+                        <canvas id="donationGrowthChart"></canvas>
+                    </div>
+                </div>
+                <div class="dashboard-card bg-white p-6 rounded-xl space-y-4">
+                    <h3 class="text-xl font-header text-cinza-escuro border-b pb-3 flex items-center">
+                        <i data-lucide="rocket" class="w-5 h-5 mr-2 text-azul-cooperativa"></i> Gamificação
+                    </h3>
+                    <div class="relative flex justify-center items-center py-4 h-44">
+                        <canvas id="gamificationProgressChart"></canvas>
+                        <div class="absolute text-center">
+                            <p class="text-4xl font-header text-verde-principal">60%</p>
+                            <p class="text-xs text-gray-500 font-medium">Próxima Meta</p>
+                        </div>
+                    </div>
+                    <p class="text-center text-sm text-gray-600 font-medium">
+                        Meta: 10 doações no trimestre.
+                        <span class="text-verde-principal block mt-1">6/10 concluído.</span>
+                    </p>
+                    <div class="grid grid-cols-3 gap-4 text-center border-t border-cinza-claro pt-4">
+                        <div class="space-y-1 transform hover:scale-110 transition duration-300">
+                            <div class="p-3 bg-laranja/10 rounded-full inline-block"><i data-lucide="award" class="w-8 h-8 mx-auto text-laranja"></i></div>
+                            <p class="text-xs font-medium text-cinza-escuro">Mega Doador</p>
+                        </div>
+                        <div class="space-y-1 transform hover:scale-110 transition duration-300">
+                             <div class="p-3 bg-verde-principal/10 rounded-full inline-block"><i data-lucide="medal" class="w-8 h-8 mx-auto text-verde-principal"></i></div>
+                            <p class="text-xs font-medium text-cinza-escuro">CO₂ Hero</p>
+                        </div>
+                        <div class="space-y-1 opacity-60 filter grayscale transform hover:scale-105 transition duration-300">
+                            <div class="p-3 bg-cinza-medio/20 rounded-full inline-block"><i data-lucide="star" class="w-8 h-8 mx-auto text-gray-400"></i></div>
+                            <p class="text-xs font-medium text-gray-500">Doador Fiel</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-card bg-white p-6 rounded-xl space-y-4">
+                <h3 class="text-xl font-header text-cinza-escuro border-b pb-3 flex items-center">
+                    <i data-lucide="history" class="w-5 h-5 mr-2 text-laranja"></i> Histórico de Doações
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full interactive-table">
+                        <thead>
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Data</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Alimento</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Peso (kg)</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Receptor</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">16/Set</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">Pães e Bolos</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">80</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">Cozinha Solidária</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <span class="status-badge completed-badge">Entregue</span>
+                                </td>
+                            </tr>
+                             <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">15/Out</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">Hortifrúti</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">120</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">ONG Amiga</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <span class="status-badge bg-azul-cooperativa text-white">Em Rota</span>
+                                </td>
+                            </tr>
+                             <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">17/Out</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">Laticínios</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">50</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">ONG Esperança</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <span class="status-badge pending-badge">Ag. Coleta</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">01/Out</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">Carnes e Aves</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">150</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">Abrigo Municipal</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <span class="status-badge completed-badge">Entregue</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="receptor-dashboard" class="hidden space-y-10 dashboard-enter">
+            <h1 class="text-4xl font-header text-cinza-escuro pb-4 border-b border-cinza-medio mb-8">Painel do Receptor</h1>
+            <div class="dashboard-card grid md:grid-cols-3 gap-6 bg-white p-8 rounded-xl border-t-4 border-laranja">
+                 <h3 class="md:col-span-3 text-xl font-header text-cinza-escuro border-b pb-4 mb-4">Nosso Impacto</h3>
+                <div class="text-center">
+                    <p class="text-5xl font-header text-laranja">12.5K</p>
+                    <p class="text-sm text-gray-500 mt-2">Refeições Geradas</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-5xl font-header text-verde-principal">1.8T</p>
+                    <p class="text-sm text-gray-500 mt-2">Kg Recebidos</p>
+                </div>
+                 <div class="text-center">
+                    <p class="text-5xl font-header text-azul-cooperativa">85</p>
+                    <p class="text-sm text-gray-500 mt-2">Doadores Parceiros</p>
+                </div>
+            </div>
+            <div class="dashboard-card bg-white p-6 rounded-xl space-y-4">
+                <h3 class="text-xl font-header text-cinza-escuro border-b pb-3">Ofertas de Doação Próximas</h3>
+                <div class="grid md:grid-cols-2 gap-4 pt-4">
+                    <div class="border border-laranja/50 rounded-xl p-4 space-y-2 hover:bg-laranja/5 transition hover:shadow-lg">
+                        <p class="text-lg font-medium">Hortifrúti Fresco - 150kg</p>
+                        <p class="text-sm text-gray-600 flex items-center"><i data-lucide="map-pin" class="w-4 h-4 mr-2"></i>Doador: <span class="font-semibold ml-1">Supermercado Central (5km)</span></p>
+                        <p class="text-xs text-gray-500">Validade: 3 dias | Coleta sugerida: 18/Out</p>
+                        <div class="flex flex-wrap gap-2 pt-2">
+                            <button class="flex-1 bg-laranja text-white py-2 px-3 rounded-lg text-sm cta-btn hover:bg-orange-600 cta-btn-shadow">Aceitar</button>
+                            <button class="flex-1 border border-gray-300 text-gray-600 py-2 px-3 rounded-lg text-sm cta-btn hover:bg-cinza-claro">Recusar</button>
+                            <button class="w-full mt-2 border border-azul-cooperativa text-azul-cooperativa py-2 px-3 rounded-lg text-sm cta-btn hover:bg-azul-cooperativa hover:text-white" onclick="showOfferDetailsModal()">
+                                <i data-lucide="search" class="w-4 h-4 inline mr-1"></i> Inspecionar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="border border-laranja/50 rounded-xl p-4 space-y-2 hover:bg-laranja/5 transition hover:shadow-lg">
+                        <p class="text-lg font-medium">Pães e Grãos - 50kg</p>
+                        <p class="text-sm text-gray-600 flex items-center"><i data-lucide="map-pin" class="w-4 h-4 mr-2"></i>Doador: <span class="font-semibold ml-1">Padaria do Bairro (2km)</span></p>
+                        <p class="text-xs text-gray-500">Validade: 1 dia | Coleta sugerida: Hoje</p>
+                         <div class="flex flex-wrap gap-2 pt-2">
+                           <button class="flex-1 bg-laranja text-white py-2 px-3 rounded-lg text-sm cta-btn hover:bg-orange-600 cta-btn-shadow">Aceitar</button>
+                            <button class="flex-1 border border-gray-300 text-gray-600 py-2 px-3 rounded-lg text-sm cta-btn hover:bg-cinza-claro">Recusar</button>
+                            <button class="w-full mt-2 border border-azul-cooperativa text-azul-cooperativa py-2 px-3 rounded-lg text-sm cta-btn hover:bg-azul-cooperativa hover:text-white" onclick="showOfferDetailsModal()">
+                                <i data-lucide="search" class="w-4 h-4 inline mr-1"></i> Inspecionar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="dashboard-card bg-white p-6 rounded-xl space-y-4">
+                <h3 class="text-xl font-header text-cinza-escuro border-b pb-3">Histórico de Recebimentos</h3>
+                 <div class="overflow-x-auto pt-2">
+                    <table class="min-w-full interactive-table">
+                        <thead>
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Data</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Doador</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Peso (kg)</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Retirada</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">10/Out</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">Hortifrúti Legal</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">90</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium"><span class="status-badge completed-badge">Entregue</span></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm"><button class="text-azul-cooperativa text-xs hover:underline">Via Coop.</button></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">01/Out</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">Mercado Popular</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">220</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium"><span class="status-badge pending-badge">Pendente</span></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm"><button class="text-verde-principal text-xs hover:underline">Agendar Retirada</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="cooperativa-dashboard" class="hidden space-y-10 dashboard-enter">
+            <h1 class="text-4xl font-header text-cinza-escuro pb-4 border-b border-cinza-medio mb-8">Painel da Cooperativa</h1>
+            <div class="dashboard-card grid md:grid-cols-3 gap-6 bg-white p-8 rounded-xl border-t-4 border-azul-cooperativa">
+                 <h3 class="md:col-span-3 text-xl font-header text-cinza-escuro border-b pb-4 mb-4">Performance do Mês</h3>
+                <div class="text-center">
+                    <p class="text-5xl font-header text-azul-cooperativa">4.8T</p>
+                    <p class="text-sm text-gray-500 mt-2">Kg Coletados</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-5xl font-header text-verde-principal">112</p>
+                    <p class="text-sm text-gray-500 mt-2">Rotas Concluídas</p>
+                </div>
+                 <div class="text-center">
+                    <p class="text-5xl font-header text-verde-escuro">R$ 5.6k</p>
+                    <p class="text-sm text-gray-500 mt-2">Renda Gerada</p>
+                </div>
+            </div>
+            <div class="grid lg:grid-cols-2 gap-8">
+                <div class="dashboard-card bg-white p-6 rounded-xl space-y-4">
+                    <h3 class="text-xl font-header text-cinza-escuro border-b pb-3">Rotas Disponíveis</h3>
+                    <div class="space-y-3 pt-2">
+                        <div class="border border-azul-cooperativa/50 rounded-xl p-4 hover:bg-blue-500/5 transition hover:shadow-lg">
+                            <div class="flex justify-between items-center">
+                                <p class="font-medium">Rota A: 2 Coletas (80kg)</p>
+                                <button class="bg-azul-cooperativa text-white py-2 px-4 rounded-lg text-sm cta-btn hover:bg-blue-600 cta-btn-shadow">Aceitar</button>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-2">Padaria Doce <i data-lucide="arrow-right" class="inline w-4 h-4"></i> Cozinha Solidária</p>
+                            <p class="text-xs text-gray-500 mt-1">Previsão de Renda: R$ 45,00</p>
+                        </div>
+                        <div class="border border-azul-cooperativa/50 rounded-xl p-4 hover:bg-blue-500/5 transition hover:shadow-lg">
+                            <div class="flex justify-between items-center">
+                                <p class="font-medium">Rota B: 1 Coleta (220kg)</p>
+                                <button class="bg-azul-cooperativa text-white py-2 px-4 rounded-lg text-sm cta-btn hover:bg-blue-600 cta-btn-shadow">Aceitar</button>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-2">Hipermercado <i data-lucide="arrow-right" class="inline w-4 h-4"></i> Abrigo + ONG</p>
+                            <p class="text-xs text-gray-500 mt-1">Previsão de Renda: R$ 78,00</p>
+                        </div>
+                    </div>
+                </div>
+                 <div class="dashboard-card bg-laranja/10 p-6 rounded-xl space-y-4 border border-laranja">
+                    <h3 class="text-xl font-header text-cinza-escuro border-b border-laranja/50 pb-3">Sua Rota Atual</h3>
+                    <p class="font-medium text-laranja pt-2 text-lg">Próxima Parada (Coleta): Padaria Doce</p>
+                    <div class="flex flex-wrap gap-4 pt-2">
+                        <button class="flex-1 bg-verde-principal text-white py-2 px-4 rounded-xl text-sm cta-btn cta-btn-shadow hover:bg-green-700">
+                            <i data-lucide="check" class="w-4 h-4 inline mr-1"></i> Confirmar Coleta
+                        </button>
+                        <button class="flex-1 bg-azul-cooperativa text-white py-2 px-4 rounded-xl text-sm cta-btn cta-btn-shadow hover:bg-blue-600">
+                            <i data-lucide="signature" class="w-4 h-4 inline mr-1"></i> Confirmar Entrega
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="dashboard-card bg-white p-6 rounded-xl space-y-4">
+                <h3 class="text-xl font-header text-cinza-escuro border-b pb-3">Histórico de Rotas</h3>
+                <div class="overflow-x-auto pt-2">
+                    <table class="min-w-full interactive-table">
+                        <thead>
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Data</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Rotas</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Kg Coletados</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Renda</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">10/Out</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">3</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">450</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">R$ 130</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium"><span class="status-badge completed-badge">Concluída</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="admin-dashboard" class="hidden space-y-10 dashboard-enter">
+            <h1 class="text-4xl font-header text-cinza-escuro pb-4 border-b border-cinza-medio mb-8">Painel Administrativo</h1>
+            <div class="dashboard-card grid md:grid-cols-4 gap-6 bg-white p-8 rounded-xl border-t-4 border-cinza-escuro">
+                <div class="text-center">
+                    <p class="text-5xl font-header text-verde-principal">350</p>
+                    <p class="text-sm text-gray-500 mt-2">Usuários Ativos</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-5xl font-header text-azul-cooperativa">2.5K</p>
+                    <p class="text-sm text-gray-500 mt-2">Doações (Mês)</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-5xl font-header text-laranja">10.2T</p>
+                    <p class="text-sm text-gray-500 mt-2">Total Kg Coletados</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-5xl font-header text-verde-escuro">2.1T</p>
+                    <p class="text-sm text-gray-500 mt-2">CO₂ Evitado</p>
+                </div>
+            </div>
+            <div class="dashboard-card bg-white p-6 rounded-xl space-y-4">
+                <h3 class="text-xl font-header text-cinza-escuro border-b pb-3">Gerenciar Usuários</h3>
+                <div class="overflow-x-auto pt-2">
+                    <table class="min-w-full interactive-table">
+                        <thead>
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">ID / Nome</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Tipo</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">ONG Esperança</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm"><span class="font-semibold text-laranja">Receptor</span></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium"><span class="status-badge pending-badge">Pendente</span></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
+                                    <button class="text-xs bg-verde-principal text-white py-1 px-3 rounded-full hover:bg-verde-escuro">Aprovar</button>
+                                    <button class="text-xs bg-red-500 text-white py-1 px-3 rounded-full hover:bg-red-700">Rejeitar</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">Transportadora Alpha</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm"><span class="font-semibold text-azul-cooperativa">Cooperativa</span></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium"><span class="status-badge completed-badge">Ativo</span></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
+                                    <button class="text-xs bg-cinza-escuro text-white py-1 px-3 rounded-full hover:bg-black">Bloquear</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <div id="registration-modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="modal-content bg-white w-full max-w-lg p-8 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-start mb-6">
+                <h2 class="text-2xl font-header text-verde-principal flex items-center">
+                     <i data-lucide="package-plus" class="w-7 h-7 mr-3"></i> Registrar Nova Doação
+                </h2>
+                <button class="text-gray-400 hover:text-gray-600" onclick="hideRegistrationModal()">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+    
+            <form class="space-y-5">
+                <div>
+                    <label class="block text-md font-header text-gray-700 mb-2">Qual a categoria do alimento?</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
+                        <div>
+                            <input type="checkbox" id="cat-hortifruti" name="categoria" value="hortifruti" class="hidden peer">
+                            <label for="cat-hortifruti" class="flex flex-col items-center justify-center p-3 border-2 border-gray-200 rounded-xl cursor-pointer peer-checked:border-verde-principal peer-checked:text-verde-principal peer-checked:font-bold hover:bg-gray-50 transition">
+                                <i data-lucide="carrot" class="w-6 h-6 mb-1"></i> Hortifrúti
+                            </label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="cat-padaria" name="categoria" value="padaria" class="hidden peer">
+                            <label for="cat-padaria" class="flex flex-col items-center justify-center p-3 border-2 border-gray-200 rounded-xl cursor-pointer peer-checked:border-verde-principal peer-checked:text-verde-principal peer-checked:font-bold hover:bg-gray-50 transition">
+                                <i data-lucide="cake" class="w-6 h-6 mb-1"></i> Padaria
+                            </label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="cat-carnes" name="categoria" value="carnes" class="hidden peer">
+                            <label for="cat-carnes" class="flex flex-col items-center justify-center p-3 border-2 border-gray-200 rounded-xl cursor-pointer peer-checked:border-verde-principal peer-checked:text-verde-principal peer-checked:font-bold hover:bg-gray-50 transition">
+                                <i data-lucide="beef" class="w-6 h-6 mb-1"></i> Carnes
+                            </label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="cat-laticinios" name="categoria" value="laticinios" class="hidden peer">
+                            <label for="cat-laticinios" class="flex flex-col items-center justify-center p-3 border-2 border-gray-200 rounded-xl cursor-pointer peer-checked:border-verde-principal peer-checked:text-verde-principal peer-checked:font-bold hover:bg-gray-50 transition">
+                                <i data-lucide="milk" class="w-6 h-6 mb-1"></i> Laticínios
+                            </label>
+                        </div>
+                         <div>
+                            <input type="checkbox" id="cat-naoperecivel" name="categoria" value="nao-perecivel" class="hidden peer">
+                            <label for="cat-naoperecivel" class="flex flex-col items-center justify-center p-3 border-2 border-gray-200 rounded-xl cursor-pointer peer-checked:border-verde-principal peer-checked:text-verde-principal peer-checked:font-bold hover:bg-gray-50 transition">
+                                <i data-lucide="package" class="w-6 h-6 mb-1"></i> Não Perecível
+                            </label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="cat-outro" name="categoria" value="outro" class="hidden peer">
+                            <label for="cat-outro" class="flex flex-col items-center justify-center p-3 border-2 border-gray-200 rounded-xl cursor-pointer peer-checked:border-verde-principal peer-checked:text-verde-principal peer-checked:font-bold hover:bg-gray-50 transition">
+                                <i data-lucide="pencil" class="w-6 h-6 mb-1"></i> Outro
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <input type="text" id="outro-categoria-input" placeholder="Especifique a categoria" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-verde-principal focus:border-verde-principal hidden transition-all duration-300">
+    
+                <div>
+                    <label for="alimento-nome" class="block text-md font-header text-gray-700 mb-2">Nome do item e detalhes</label>
+                    <input type="text" id="alimento-nome" placeholder="Ex: Pão Francês, Arroz Agulhinha Tipo 1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-verde-principal focus:border-verde-principal">
+                </div>
+    
+                <div class="grid grid-cols-2 gap-4">
+                     <div>
+                        <label for="alimento-peso" class="block text-md font-header text-gray-700 mb-2">Peso (kg)</label>
+                        <input type="number" id="alimento-peso" placeholder="Aprox." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-verde-principal focus:border-verde-principal">
+                    </div>
+                    <div>
+                        <label for="alimento-validade" class="block text-md font-header text-gray-700 mb-2">Validade</label>
+                        <input type="date" id="alimento-validade" class="w-full p-3 border border-gray-300 rounded-lg text-gray-500 focus:ring-verde-principal focus:border-verde-principal">
+                    </div>
+                </div>
+                
+                 <div>
+                    <label class="block text-md font-header text-gray-700 mb-2">Necessidades de Armazenamento</label>
+                     <div class="flex flex-wrap gap-4">
+                        <div class="flex items-center">
+                            <input id="armazenamento-ambiente" name="armazenamento" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-verde-principal focus:ring-verde-principal">
+                            <label for="armazenamento-ambiente" class="ml-2 block text-sm text-gray-900">Ambiente</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input id="armazenamento-refrigerado" name="armazenamento" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-verde-principal focus:ring-verde-principal">
+                            <label for="armazenamento-refrigerado" class="ml-2 block text-sm text-gray-900">Refrigerado</label>
+                        </div>
+                         <div class="flex items-center">
+                            <input id="armazenamento-congelado" name="armazenamento" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-verde-principal focus:ring-verde-principal">
+                            <label for="armazenamento-congelado" class="ml-2 block text-sm text-gray-900">Congelado</label>
+                        </div>
+                    </div>
+                </div>
+    
+                <div>
+                    <label for="alimento-foto" class="block text-md font-header text-gray-700 mb-2">Foto do lote (opcional)</label>
+                    <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 hover:border-verde-principal transition">
+                        <div class="text-center">
+                            <i data-lucide="image" class="mx-auto h-12 w-12 text-gray-400"></i>
+                            <div class="mt-4 flex text-sm leading-6 text-gray-600">
+                                <label for="alimento-foto-input" class="relative cursor-pointer rounded-md bg-white font-semibold text-verde-principal focus-within:outline-none focus-within:ring-2 focus-within:ring-verde-principal focus-within:ring-offset-2 hover:text-verde-escuro">
+                                    <span>Carregue um arquivo</span>
+                                    <input id="alimento-foto-input" name="alimento-foto" type="file" class="sr-only">
+                                </label>
+                                <p class="pl-1">ou arraste e solte</p>
+                            </div>
+                            <p class="text-xs leading-5 text-gray-600">PNG, JPG até 10MB</p>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="flex justify-end items-center mt-8 pt-5 border-t space-x-4">
+                     <button type="button" class="text-gray-600 py-2 px-6 rounded-xl hover:bg-cinza-claro font-medium" onclick="hideRegistrationModal()">
+                        Cancelar
+                    </button>
+                    <button type="button" class="bg-verde-principal text-white py-3 px-8 rounded-xl cta-btn hover:bg-verde-escuro cta-btn-shadow" onclick="hideRegistrationModal()">
+                        <i data-lucide="send" class="w-5 h-5 inline mr-2"></i> Confirmar Doação
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="offer-details-modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="modal-content bg-white w-full max-w-2xl p-8 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-start mb-6">
+                <h2 class="text-2xl font-header text-laranja flex items-center">
+                    <i data-lucide="search" class="w-7 h-7 mr-3"></i> Detalhes da Doação
+                </h2>
+                <button class="text-gray-400 hover:text-gray-600" onclick="hideOfferDetailsModal()">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+    
+            <div class="space-y-6">
+                <div>
+                    <h3 class="font-header text-lg text-gray-800 border-b pb-2 mb-3">Doador</h3>
+                    <div class="flex items-center text-gray-700">
+                        <i data-lucide="map-pin" class="w-5 h-5 mr-3 text-gray-500"></i>
+                        <p><span class="font-bold">Supermercado Central</span> (Aprox. 5km de distância)</p>
+                    </div>
+                </div>
+    
+                <div>
+                    <h3 class="font-header text-lg text-gray-800 border-b pb-2 mb-3">Itens Inclusos (150kg Total)</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-sm">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="px-4 py-2 text-left font-semibold">Produto</th>
+                                    <th class="px-4 py-2 text-left font-semibold">Validade</th>
+                                    <th class="px-4 py-2 text-left font-semibold">Peso (Aprox.)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b">
+                                    <td class="px-4 py-2">Tomates</td>
+                                    <td class="px-4 py-2">20/10/2025</td>
+                                    <td class="px-4 py-2">50 kg</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="px-4 py-2">Alface e Rúcula</td>
+                                    <td class="px-4 py-2">19/10/2025</td>
+                                    <td class="px-4 py-2">30 kg</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2">Batatas</td>
+                                    <td class="px-4 py-2">30/10/2025</td>
+                                    <td class="px-4 py-2">70 kg</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+    
+                 <div>
+                    <h3 class="font-header text-lg text-gray-800 border-b pb-2 mb-3">Armazenamento</h3>
+                     <div class="flex items-center text-gray-700">
+                        <i data-lucide="thermometer-snowflake" class="w-5 h-5 mr-3 text-blue-500"></i>
+                        <p>Necessita de refrigeração para os folhosos.</p>
+                    </div>
+                </div>
+    
+                <div>
+                    <h3 class="font-header text-lg text-gray-800 border-b pb-2 mb-3">Foto do Lote</h3>
+                    <div class="bg-gray-200 h-48 rounded-lg flex items-center justify-center">
+                        <p class="text-gray-500">[Visualização da imagem da doação]</p>
+                    </div>
+                </div>
+            </div>
+    
+            <div class="flex flex-col sm:flex-row justify-end items-center mt-8 pt-5 border-t space-y-3 sm:space-y-0 sm:space-x-4">
+                 <button type="button" class="w-full sm:w-auto text-gray-600 py-2 px-6 rounded-xl hover:bg-cinza-claro font-medium" onclick="hideOfferDetailsModal()">
+                    Fechar
+                </button>
+                 <button type="button" class="w-full sm:w-auto bg-gray-600 text-white py-2 px-6 rounded-xl cta-btn hover:bg-gray-700" onclick="hideOfferDetailsModal()">
+                    Recusar
+                </button>
+                <button type="button" class="w-full sm:w-auto bg-laranja text-white py-3 px-8 rounded-xl cta-btn hover:bg-orange-600 cta-btn-shadow" onclick="hideOfferDetailsModal()">
+                    <i data-lucide="check-circle" class="w-5 h-5 inline mr-2"></i> Aceitar Doação
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <footer class="bg-cinza-escuro mt-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-white/80">
+            <div class="border-t border-white/10 mt-6 pt-6 text-center text-xs">
+                &copy; 2025 Reaproveita+. Todos os direitos reservados.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        const landingPage = document.getElementById('landing-page');
+        const cadastroSection = document.getElementById('cadastro');
+        const dashboards = {
+            'doador': document.getElementById('doador-dashboard'),
+            'receptor': document.getElementById('receptor-dashboard'),
+            'cooperativa': document.getElementById('cooperativa-dashboard'),
+            'admin': document.getElementById('admin-dashboard'),
+        };
+        const loginBtn = document.getElementById('login-btn');
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const signupHeader = document.getElementById('signup-header');
+        const signupBtnSubmit = document.getElementById('signup-btn-submit');
+        const loginBtnSubmit = document.getElementById('login-btn-submit');
+        const userTypeButtons = document.querySelectorAll('.user-type-btn');
+        const impactSection = document.getElementById('impacto');
+        const metricKg = document.getElementById('metric-kg');
+        const metricCo2 = document.getElementById('metric-co2');
+        const metricFamilies = document.getElementById('metric-families');
+        const registrationModal = document.getElementById('registration-modal');
+        const offerDetailsModal = document.getElementById('offer-details-modal');
+        let selectedUserType = 'doador';
+        const userConfig = {
+            'doador': { color: 'bg-verde-principal', text: 'Doador', hover: 'hover:bg-green-700', placeholder: 'Nome da Empresa / Estabelecimento', shadow: '0 10px 20px rgba(76, 175, 80, 0.4)', border: '#4CAF50' },
+            'receptor': { color: 'bg-laranja', text: 'Receptor (ONG / Cozinha)', hover: 'hover:bg-orange-600', placeholder: 'Nome da Instituição', shadow: '0 10px 20px rgba(255, 167, 38, 0.4)', border: '#FFA726' },
+            'cooperativa': { color: 'bg-azul-cooperativa', text: 'Cooperativa / Transportador', hover: 'hover:bg-blue-600', placeholder: 'Nome da Cooperativa / Transportador', shadow: '0 10px 20px rgba(66, 165, 245, 0.4)', border: '#42A5F5' },
+        };
+        let charts = {};
+
+        function applyTransition(element, activate) {
+            if (activate) {
+                element.classList.remove('hidden');
+                void element.offsetWidth; 
+                element.classList.add('active');
+            } else {
+                element.classList.remove('active');
+                setTimeout(() => {
+                    element.classList.add('hidden');
+                }, 400); 
+            }
+        }
+
+        function showSection(sectionId) {
+            landingPage.classList.add('hidden');
+            cadastroSection.classList.add('hidden');
+            Object.values(dashboards).forEach(d => {
+                d.classList.add('hidden');
+                d.classList.remove('active');
+            });
+            if (sectionId === 'home') {
+                landingPage.classList.remove('hidden');
+                loginBtn.textContent = 'Login';
+                loginBtn.onclick = toggleDashboard;
+            } else if (sectionId === 'cadastro') {
+                cadastroSection.classList.remove('hidden');
+                showLogin(false); 
+                selectUserType('doador');
+            } else if (dashboards[sectionId]) {
+                dashboards[sectionId].classList.remove('hidden');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function showSignup() {
+            applyTransition(loginForm, false);
+            setTimeout(() => {
+                applyTransition(signupForm, true);
+                document.getElementById('auth-title').textContent = 'Novo Cadastro';
+                selectUserType(selectedUserType);
+            }, 400);
+        }
+
+        function showLogin(animate = true) {
+            if (animate) {
+                applyTransition(signupForm, false);
+                setTimeout(() => {
+                    applyTransition(loginForm, true);
+                    document.getElementById('auth-title').textContent = 'Faça Login';
+                }, 400);
+            } else {
+                signupForm.classList.add('hidden');
+                loginForm.classList.remove('hidden');
+                loginForm.classList.add('active');
+                document.getElementById('auth-title').textContent = 'Faça Login';
+            }
+        }
+
+        function selectUserType(type) {
+            if (type === 'admin') return; 
+            selectedUserType = type;
+            const config = userConfig[type];
+            userTypeButtons.forEach(btn => {
+                const role = btn.id.split('-')[1];
+                const baseConfig = userConfig[role];
+                btn.classList.remove('selected', 'bg-verde-principal', 'bg-laranja', 'bg-azul-cooperativa');
+                btn.style.boxShadow = ''; 
+                btn.style.borderColor = 'transparent'; 
+                if (role === type) {
+                    btn.classList.add('selected', baseConfig.color);
+                    btn.style.boxShadow = config.shadow;
+                    btn.style.borderColor = config.border;
+                } else {
+                    btn.classList.add(baseConfig.color);
+                }
+            });
+            loginBtnSubmit.classList.remove('bg-verde-principal', 'bg-laranja', 'bg-azul-cooperativa', 'hover:bg-green-700', 'hover:bg-orange-600', 'hover:bg-blue-600');
+            loginBtnSubmit.classList.add(config.color, config.hover);
+            signupHeader.textContent = `Cadastro de ${config.text}`;
+            signupBtnSubmit.classList.remove('bg-verde-principal', 'bg-laranja', 'bg-azul-cooperativa', 'hover:bg-green-700', 'hover:bg-orange-600', 'hover:bg-blue-600');
+            signupBtnSubmit.classList.add(config.color, config.hover);
+            document.getElementById('signup-nome').placeholder = config.placeholder;
+        }
+
+        let isLoggedIn = false;
+        let currentUserRole = 'doador';
+        function toggleDashboard() {
+            if (isLoggedIn) {
+                isLoggedIn = false;
+                showSection('home');
+            } else {
+                currentUserRole = selectedUserType; 
+                isLoggedIn = true;
+                const email = document.querySelector('#login-form input[type="email"]').value;
+                if (email === "admin@reaproveita.com") {
+                    currentUserRole = 'admin';
+                }
+                landingPage.classList.add('hidden');
+                cadastroSection.classList.add('hidden');
+                Object.values(dashboards).forEach(d => {
+                    d.classList.add('hidden');
+                    d.classList.remove('active');
+                });
+                if (dashboards[currentUserRole]) {
+                    const activeDashboard = dashboards[currentUserRole];
+                    activeDashboard.classList.remove('hidden');
+                    setTimeout(() => {
+                        activeDashboard.classList.add('active');
+                        lucide.createIcons();
+                        if (currentUserRole === 'doador') {
+                           initDonorCharts();
+                        }
+                    }, 50);
+                    loginBtn.textContent = `Logout (${currentUserRole.charAt(0).toUpperCase() + currentUserRole.slice(1)})`;
+                    loginBtn.onclick = toggleDashboard; 
+                }
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+        
+        function scrollToElement(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        
+        function showRegistrationModal() {
+            registrationModal.classList.add('open');
+            lucide.createIcons();
+        }
+
+        function hideRegistrationModal() {
+            registrationModal.classList.remove('open');
+        }
+
+        function showOfferDetailsModal() {
+            offerDetailsModal.classList.add('open');
+            lucide.createIcons();
+        }
+
+        function hideOfferDetailsModal() {
+            offerDetailsModal.classList.remove('open');
+        }
+
+        let kg = 150;
+        let co2 = 12.5;
+        let families = 450;
+        let initialMetricsUpdated = false;
+
+        function countUp(targetElement, startValue, endValue, duration) {
+            let startTime = null;
+            const range = endValue - startValue;
+            const formatter = targetElement.id === 'metric-co2' 
+                ? (value) => value.toFixed(2) + 'K+' 
+                : (value) => new Intl.NumberFormat('pt-BR').format(Math.round(value)) + (targetElement.id === 'metric-kg' ? 'K+' : '');
+            
+            function step(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const progress = timestamp - startTime;
+                const percentage = Math.min(progress / duration, 1);
+                const currentValue = startValue + (range * percentage);
+                targetElement.textContent = formatter(currentValue);
+                if (progress < duration) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    targetElement.textContent = formatter(endValue);
+                }
+            }
+            window.requestAnimationFrame(step);
+        }
+        
+        function updateInitialMetrics() {
+            if (initialMetricsUpdated) return;
+            countUp(metricKg, 0, kg, 1500);
+            countUp(metricCo2, 0, co2, 1800);
+            countUp(metricFamilies, 0, families, 2000);
+            setTimeout(updateContinuousMetrics, 5000);
+            initialMetricsUpdated = true;
+        }
+
+        function updateContinuousMetrics() {
+            let newKg = kg + Math.floor(Math.random() * 5 + 1);
+            kg = newKg;
+            metricKg.textContent = new Intl.NumberFormat('pt-BR').format(newKg) + 'K+';
+            co2 = co2 + Math.round((Math.random() * 0.1 + 0.05) * 100) / 100;
+            families += Math.floor(Math.random() * 3 + 1);
+            metricCo2.textContent = co2.toFixed(2) + 'K+';
+            metricFamilies.textContent = new Intl.NumberFormat('pt-BR').format(families);
+            setTimeout(updateContinuousMetrics, 5000);
+        }
+        
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.5
+        };
+
+        const impactObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !initialMetricsUpdated) {
+                    updateInitialMetrics();
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        const outroCheckbox = document.getElementById('cat-outro');
+        const outroInput = document.getElementById('outro-categoria-input');
+        if (outroCheckbox && outroInput) {
+            outroCheckbox.addEventListener('change', () => {
+                outroInput.classList.toggle('hidden', !outroCheckbox.checked);
+            });
+        }
+
+        function initDonorCharts() {
+            if (charts.donationGrowth) charts.donationGrowth.destroy();
+            const growthCtx = document.getElementById('donationGrowthChart').getContext('2d');
+            charts.donationGrowth = new Chart(growthCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out'],
+                    datasets: [{
+                        label: 'Kg Doados por Mês',
+                        data: [250, 310, 450, 400, 550, 620],
+                        borderColor: '#4CAF50',
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#333333',
+                            titleFont: { family: 'Montserrat' },
+                            bodyFont: { family: 'Roboto' },
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.parsed.y} kg`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#F5F5F5'} },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            if (charts.gamification) charts.gamification.destroy();
+            const gamificationCtx = document.getElementById('gamificationProgressChart').getContext('2d');
+            charts.gamification = new Chart(gamificationCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Concluído', 'Faltando'],
+                    datasets: [{
+                        data: [6, 4],
+                        backgroundColor: ['#4CAF50', '#E0E0E0'],
+                        borderWidth: 0,
+                        borderRadius: 5,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    }
+                }
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+             showSection('home');
+             selectUserType('doador');
+             impactObserver.observe(impactSection);
+        });
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                if (['home', 'como-funciona', 'impacto'].includes(targetId)) {
+                    showSection('home');
+                    const targetElement = document.getElementById(targetId);
+                    if (targetElement) {
+                         targetElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
