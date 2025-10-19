@@ -10,7 +10,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reaproveita+ | Dashboards Multifuncionais</title>
+    <title>PratoCheio | Dashboards Multifuncionais</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -379,15 +379,20 @@ header {
         <div class="flex justify-between items-center h-20">
             <!-- Logo com animação -->
             <a href="#home" class="group flex items-center space-x-3" onclick="showSection('home')">
-                <div class="relative">
-                    <div class="w-12 h-12 bg-gradient-to-br from-verde-principal to-verde-escuro rounded-2xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 shadow-lg">
-                        <i data-lucide="leaf" class="w-6 h-6 text-white"></i>
-                    </div>
-                    <div class="absolute -inset-1 bg-verde-principal/20 rounded-2xl blur-sm group-hover:blur-md transition-all duration-500 opacity-0 group-hover:opacity-100"></div>
-                </div>
+               <div class="relative">
+    <!-- Glow atrás com delay -->
+    <div class="absolute inset-0 transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 delay-75">
+        <img src="logo.png" alt="" class="w-14 h-14 object-contain opacity-10 group-hover:opacity-20 blur-[1px] group-hover:blur-[1.5px]">
+    </div>
+    
+    <!-- Imagem principal -->
+    <div class="flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 relative z-10">
+        <img src="logo.png" alt="Logo PratoCheio" class="w-14 h-14 object-contain">
+    </div>
+</div>
                 <div class="flex flex-col">
-                    <span class="text-2xl font-header text-verde-principal tracking-wider font-bold">Reaproveita+</span>
-                    <span class="text-xs text-cinza-escuro/70 font-medium -mt-1">Sustentabilidade em Ação</span>
+                    <span class="text-2xl font-header text-verde-principal tracking-wider font-bold">PratoCheio</span>
+                   
                 </div>
             </a>
 
@@ -566,7 +571,7 @@ header {
             </section>
             
             <section id="como-funciona" class="text-center space-y-12 bg-white rounded-3xl p-8 shadow-xl">
-                <h2 class="text-4xl font-header text-cinza-escuro">O Ciclo do <span class="text-verde-principal">Reaproveita+</span></h2>
+                <h2 class="text-4xl font-header text-cinza-escuro">O Ciclo do <span class="text-verde-principal">PratoCheio</span></h2>
                 <div class="grid md:grid-cols-3 gap-8">
                     <div class="bg-cinza-claro p-8 rounded-2xl shadow-lg space-y-4 feature-card">
                         <i data-lucide="package-open" class="w-12 h-12 mx-auto text-verde-principal bg-verde-principal/10 p-2 rounded-full"></i>
@@ -1794,7 +1799,7 @@ header {
     <footer class="bg-cinza-escuro mt-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-white/80">
             <div class="border-t border-white/10 mt-6 pt-6 text-center text-xs">
-                &copy; 2025 Reaproveita+. Todos os direitos reservados.
+                &copy; 2025 PratoCheio. Todos os direitos reservados.
             </div>
         </div>
     </footer>
